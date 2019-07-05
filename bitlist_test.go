@@ -5,6 +5,50 @@ import (
 	"testing"
 )
 
+func TestNewBitlist(t *testing.T) {
+	tests := []struct {
+		size uint64
+		want Bitlist
+	}{
+		{
+			size: 0,
+			want: Bitlist{0x01},
+		},
+		{
+			size: 1,
+			want: Bitlist{0x02},
+		},
+		{
+			size: 2,
+			want: Bitlist{0x04},
+		},
+		{
+			size: 3,
+			want: Bitlist{0x08},
+		},
+		{
+			size: 8,
+			want: Bitlist{0x00, 0x01},
+		},
+		{
+			size: 9,
+			want: Bitlist{0x00, 0x02},
+		},
+	}
+
+	for _, tt := range tests {
+		got := NewBitlist(tt.size)
+		if !bytes.Equal(got, tt.want) {
+			t.Errorf(
+				"NewBitlist(%d) = %x, wanted %x",
+				tt.size,
+				got,
+				tt.want,
+			)
+		}
+	}
+}
+
 func TestBitlist_Len(t *testing.T) {
 	tests := []struct {
 		bitlist Bitlist
