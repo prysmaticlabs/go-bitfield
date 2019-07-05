@@ -1,5 +1,5 @@
 load("@bazel_gazelle//:def.bzl", "gazelle")
-load("@io_bazel_rules_go//go:def.bzl", "nogo")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test", "nogo")
 
 # gazelle:prefix github.com/prysmaticlabs/go-bitfield
 gazelle(
@@ -44,4 +44,27 @@ nogo(
         "@org_golang_x_tools//go/analysis/passes/inspect:go_tool_library",
         "@org_golang_x_tools//go/analysis/passes/asmdecl:go_tool_library",
     ],
+)
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "bitfield.go",
+        "bitlist.go",
+        "bitvector.go",
+        "doc.go",
+    ],
+    importpath = "github.com/prysmaticlabs/go-bitfield",
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = [
+        "bitlist_test.go",
+        "bitvector_test.go",
+    ],
+    embed = [":go_default_library"],
+    size = "small",
+    race = "on",
 )
