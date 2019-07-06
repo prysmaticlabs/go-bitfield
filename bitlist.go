@@ -74,13 +74,13 @@ func (b Bitlist) Len() uint64 {
 
 	// The absolute position of the most significant bit will be the number of
 	// bits in the preceding bytes plus the position of the most significant
-	// bit. Subtract this value by 1 to determine the length of the bitvector.
+	// bit. Subtract this value by 1 to determine the length of the bitlist.
 	return uint64(8*(len(b)-1) + msb - 1)
 }
 
 // Bytes returns the trimmed underlying byte array without the length bit. The
-// leading zeros in the bitvector will be trimmed to the smallest byte length
-// representation of the bitvector. This may produce an empty byte slice if all
+// leading zeros in the bitlist will be trimmed to the smallest byte length
+// representation of the bitlist. This may produce an empty byte slice if all
 // bits were zero.
 func (b Bitlist) Bytes() []byte {
 	ret := make([]byte, len(b))
@@ -101,4 +101,19 @@ func (b Bitlist) Bytes() []byte {
 	}
 
 	return ret[:newLen]
+}
+
+// Count returns the number of 1s in the bitlist.
+func (b Bitlist) Count() uint64 {
+	c := 0
+
+	for _, bt := range b {
+		c += bits.OnesCount8(bt)
+	}
+
+	if c > 0 {
+		c-- // Remove length bit from count.
+	}
+
+	return uint64(c)
 }
