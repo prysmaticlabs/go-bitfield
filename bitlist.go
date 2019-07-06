@@ -10,14 +10,14 @@ var _ = Bitfield(Bitlist{})
 // significant bit in the array of bytes indicates the start position of the
 // bitfield.
 //
-// Examples of the underlying byte array as bitlist:
-//  byte{0b00001000} is a bitlist with 3 bits which are all zero. bits=[0,0,0]
-//  byte{0b00011111} is a bitlist with 4 bits which are all one.  bits=[1,1,1,1]
-//  byte{0b00011000, 0b00000001} is a bitlist with 8 bits.        bits=[0,0,0,1,1,0,0,0]
-//  byte{0b00011000, 0b00000010} is a bitlist with 9 bits.        bits=[0,0,0,0,1,1,0,0,0]
+// Examples of the underlying byte array as bitvector:
+//  byte{0b00001000} is a bitvector with 3 bits which are all zero. bits=[0,0,0]
+//  byte{0b00011111} is a bitvector with 4 bits which are all one.  bits=[1,1,1,1]
+//  byte{0b00011000, 0b00000001} is a bitvector with 8 bits.        bits=[0,0,0,1,1,0,0,0]
+//  byte{0b00011000, 0b00000010} is a bitvector with 9 bits.        bits=[0,0,0,0,1,1,0,0,0]
 type Bitlist []byte
 
-// NewBitlist creates a new bitlist of size N.
+// NewBitlist creates a new bitvector of size N.
 func NewBitlist(n uint64) Bitlist {
 	ret := make(Bitlist, n/8+1)
 
@@ -29,7 +29,7 @@ func NewBitlist(n uint64) Bitlist {
 }
 
 // BitAt returns the bit value at the given index. If the index requested
-// exceeds the number of bits in the bitlist, then this method returns false.
+// exceeds the number of bits in the bitvector, then this method returns false.
 func (b Bitlist) BitAt(idx uint64) bool {
 	// Out of bounds, must be false.
 	upperBounds := b.Len()
@@ -42,7 +42,7 @@ func (b Bitlist) BitAt(idx uint64) bool {
 }
 
 // SetBitAt will set the bit at the given index to the given value. If the index
-// requested exceeds the number of bits in the bitlist, then this method returns
+// requested exceeds the number of bits in the bitvector, then this method returns
 // false.
 func (b Bitlist) SetBitAt(idx uint64, val bool) {
 	// Out of bounds, do nothing.
@@ -60,7 +60,7 @@ func (b Bitlist) SetBitAt(idx uint64, val bool) {
 
 }
 
-// Len of the bitlist returns the number of bits available in the underlying
+// Len of the bitvector returns the number of bits available in the underlying
 // byte array.
 func (b Bitlist) Len() uint64 {
 	if len(b) == 0 {
@@ -101,4 +101,19 @@ func (b Bitlist) Bytes() []byte {
 	}
 
 	return ret[:newLen]
+}
+
+// Count returns the number of 1s in the bitvector.
+func (b Bitlist) Count() uint64 {
+	c := 0
+
+	for _, bt := range b {
+		c += bits.OnesCount8(bt)
+	}
+
+	if c > 0 {
+		c-- // Remove length bit from count.
+	}
+
+	return uint64(c)
 }

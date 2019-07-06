@@ -155,3 +155,50 @@ func TestBitvector4_SetBitAt(t *testing.T) {
 		}
 	}
 }
+
+func TestBitvector4_Count(t *testing.T) {
+	tests := []struct{
+		bitvector Bitvector4
+		want      uint64
+	} {
+		{
+			bitvector: Bitvector4{},
+			want:      0,
+		},
+		{
+			bitvector: Bitvector4{0x01}, // 0b00000001
+			want:      1,
+		},
+		{
+			bitvector: Bitvector4{0x03}, // 0b00000011
+			want:      2,
+		},
+		{
+			bitvector: Bitvector4{0x07}, // 0b00000111
+			want:      3,
+		},
+		{
+			bitvector: Bitvector4{0x0F}, // 0b00001111
+			want:      4,
+		},
+		{
+			bitvector: Bitvector4{0xFF}, // 0b11111111
+			want:      4,
+		},
+		{
+			bitvector: Bitvector4{0xF0}, // 0b11110000
+			want:      0,
+		},
+	}
+
+	for _, tt := range tests {
+		if tt.bitvector.Count() != tt.want {
+			t.Errorf(
+				"(%x).Count() = %d, wanted %d",
+				tt.bitvector,
+				tt.bitvector.Count(),
+				tt.want,
+			)
+		}
+	}
+}

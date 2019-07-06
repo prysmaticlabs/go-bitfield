@@ -348,3 +348,46 @@ func TestBitlist_Bytes(t *testing.T) {
 		}
 	}
 }
+
+func TestBitlist_Count(t *testing.T) {
+	tests := []struct{
+		bitlist Bitlist
+		want uint64
+	} {
+		{
+			bitlist: Bitlist{},
+			want: 0,
+		},
+		{
+			bitlist: Bitlist{0x01}, // 0b00000001
+			want: 0,
+		},
+		{
+			bitlist: Bitlist{0x03}, // 0b00000011
+			want: 1,
+		},
+		{
+			bitlist: Bitlist{0x0F}, // 0b00001111
+			want: 3,
+		},
+		{
+			bitlist: Bitlist{0x0F, 0x01}, // 0b00001111, 0b00000001
+			want: 4,
+		},
+		{
+			bitlist: Bitlist{0x0F, 0x03}, // 0b00001111, 0b00000011
+			want: 5,
+		},
+	}
+
+	for _, tt := range tests {
+		if tt.bitlist.Count() != tt.want {
+			t.Errorf(
+				"(%x).Count() = %d, wanted %d",
+				tt.bitlist,
+				tt.bitlist.Count(),
+				tt.want,
+			)
+		}
+	}
+}
