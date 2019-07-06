@@ -157,10 +157,10 @@ func TestBitvector4_SetBitAt(t *testing.T) {
 }
 
 func TestBitvector4_Count(t *testing.T) {
-	tests := []struct{
+	tests := []struct {
 		bitvector Bitvector4
 		want      uint64
-	} {
+	}{
 		{
 			bitvector: Bitvector4{},
 			want:      0,
