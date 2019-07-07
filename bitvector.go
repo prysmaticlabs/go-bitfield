@@ -48,5 +48,14 @@ func (b Bitvector4) Count() uint64 {
 	if len(b) == 0 {
 		return 0
 	}
-	return uint64(bits.OnesCount8(b[0] & 0x0F))
+	return uint64(bits.OnesCount8(b.Bytes()[0]))
+}
+
+// Bytes returns the bytes data representing the bitvector4. This method
+// bitmasks the underlying data to ensure that it is an accurate representation.
+func (b Bitvector4) Bytes() []byte {
+	if len(b) == 0 {
+		return []byte{}
+	}
+	return []byte{b[0] & 0x0F}
 }

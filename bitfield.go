@@ -6,4 +6,5 @@ type Bitfield interface {
 	SetBitAt(idx uint64, val bool)
 	Len() uint64
 	Count() uint64
+	Bytes() []byte
 }
