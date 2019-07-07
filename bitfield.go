@@ -7,4 +7,5 @@ type Bitfield interface {
 	Len() uint64
 	Count() uint64
 	Bytes() []byte
+	Shift(int)
 }
