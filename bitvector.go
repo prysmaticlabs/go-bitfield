@@ -52,7 +52,7 @@ func (b Bitvector4) Count() uint64 {
 }
 
 // Bytes returns the bytes data representing the bitvector4. This method
-// bitmasks the underlying data to unsure that it is an accurate representation.
+// bitmasks the underlying data to ensure that it is an accurate representation.
 func (b Bitvector4) Bytes() []byte {
 	if len(b) == 0 {
 		return []byte{}
