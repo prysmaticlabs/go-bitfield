@@ -213,6 +213,10 @@ func TestBitvector4_Bytes(t *testing.T) {
 			want:      []byte{},
 		},
 		{
+			bitvector: Bitvector4{0x00}, // 0b00000000
+			want:      []byte{0x00},     // 0b00000000
+		},
+		{
 			bitvector: Bitvector4{0x01}, // 0b00000001
 			want:      []byte{0x01},     // 0b00000001
 		},
