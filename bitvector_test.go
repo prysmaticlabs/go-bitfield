@@ -202,3 +202,50 @@ func TestBitvector4_Count(t *testing.T) {
 		}
 	}
 }
+
+func TestBitvector4_Bytes(t *testing.T) {
+	tests := []struct {
+		bitvector Bitvector4
+		want      []byte
+	}{
+		{
+			bitvector: Bitvector4{},
+			want:      []byte{},
+		},
+		{
+			bitvector: Bitvector4{0x01}, // 0b00000001
+			want:      []byte{0x01},     // 0b00000001
+		},
+		{
+			bitvector: Bitvector4{0x03}, // 0b00000011
+			want:      []byte{0x03},     // 0b00000011
+		},
+		{
+			bitvector: Bitvector4{0x07}, // 0b00000111
+			want:      []byte{0x07},     // 0b00000111
+		},
+		{
+			bitvector: Bitvector4{0x0F}, // 0b00001111
+			want:      []byte{0x0F},     // 0b00001111
+		},
+		{
+			bitvector: Bitvector4{0xFF}, // 0b11111111
+			want:      []byte{0x0F},     // 0b00000001
+		},
+		{
+			bitvector: Bitvector4{0xF0}, // 0b11110000
+			want:      []byte{0x00},     // 0b00000000
+		},
+	}
+
+	for _, tt := range tests {
+		if !bytes.Equal(tt.bitvector.Bytes(), tt.want) {
+			t.Errorf(
+				"(%x).Bytes() = %x, wanted %x",
+				tt.bitvector,
+				tt.bitvector.Bytes(),
+				tt.want,
+			)
+		}
+	}
+}
