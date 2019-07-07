@@ -117,3 +117,31 @@ func (b Bitlist) Count() uint64 {
 
 	return uint64(c)
 }
+
+// Shift bitlist by i. If i >= 0, perform left shift, otherwise right shift.
+// This operation takes O(n) time where n is the number of bytes in the
+// underlying data.
+func (b Bitlist) Shift(i int) {
+	// The length bit should not be shifted. Let's take a note of the original
+	// length position so we can temporarily stash it.
+	length := (b.Len() + 1) % 8
+	lengthBitPosition := uint8(bits.Len8(byte(length)))
+
+	// Remove length bit
+	b[len(b)-1] &^= 0x01 << lengthBitPosition
+
+	if i > 0 { // Left shift
+		for idx, _ := range b {
+			// TODO: Handle overflowed bits. They should go into the next byte.
+			b[idx] <<= uint8(i)
+		}
+
+	} else if i < 0 { // Right shift
+		// TODO: backwards
+	}
+
+	// Reset length bit.
+	b[len(b)-1] |= 0x01 << lengthBitPosition
+	// Remove any bits that shift beyond length bit position.
+	b[len(b)-1] &= 0xFF >> (8 - length)
+}

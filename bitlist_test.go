@@ -391,3 +391,48 @@ func TestBitlist_Count(t *testing.T) {
 		}
 	}
 }
+
+func TestBitlist_Shift(t *testing.T) {
+	tests := []struct {
+		bitlist Bitlist
+		shift   int
+		want    Bitlist
+	}{
+		{
+			bitlist: Bitlist{0x03}, // 0b00000011
+			shift:   1,
+			want:    Bitlist{0x02}, // 0b00000010
+		},
+		{
+			bitlist: Bitlist{0x0F}, // 0b00001111
+			shift:   1,
+			want:    Bitlist{0x0E}, // 0b00001110
+		},
+		{
+			bitlist: Bitlist{0xFF, 0x04}, // 0b11111111, 0b00000100
+			shift:   4,
+			want:    Bitlist{0xF0, 0x07}, // 0b11110000, 0b00000111
+		},
+		{
+			bitlist: Bitlist{0xFF, 0x00, 0x00, 0x04}, // 0b11111111, 0b00000000, 0b00000000, 0b00000100
+			shift:   18,
+			want:    Bitlist{0x00, 0x00, 0xFC, 0x07}, // 0b00000000, 0b00000000, 0b11111100, 0b00000111
+		},
+	}
+
+	for _, tt := range tests {
+		original := make(Bitlist, len(tt.bitlist))
+		copy(original, tt.bitlist)
+
+		tt.bitlist.Shift(tt.shift)
+		if !bytes.Equal(tt.bitlist, tt.want) {
+			t.Errorf(
+				"(%x).Shift(%d) = %x, wanted %x",
+				original,
+				tt.shift,
+				tt.bitlist,
+				tt.want,
+			)
+		}
+	}
+}
