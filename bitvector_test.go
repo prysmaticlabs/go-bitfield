@@ -253,3 +253,93 @@ func TestBitvector4_Bytes(t *testing.T) {
 		}
 	}
 }
+
+func TestBitvector4_Shift(t *testing.T) {
+	tests := []struct {
+		bitvector Bitvector4
+		shift     int
+		want      Bitvector4
+	}{
+		{
+			bitvector: Bitvector4{},
+			shift:     1,
+			want:      Bitvector4{},
+		},
+		{
+			bitvector: Bitvector4{0x01},
+			shift:     1,
+			want:      Bitvector4{0x02},
+		},
+		{
+			bitvector: Bitvector4{0x02},
+			shift:     1,
+			want:      Bitvector4{0x04},
+		},
+		{
+			bitvector: Bitvector4{0x04},
+			shift:     1,
+			want:      Bitvector4{0x08},
+		},
+		{
+			bitvector: Bitvector4{0x08},
+			shift:     1,
+			want:      Bitvector4{0x00},
+		},
+		{
+			bitvector: Bitvector4{0x03},
+			shift:     1,
+			want:      Bitvector4{0x06},
+		},
+		{
+			bitvector: Bitvector4{0x02},
+			shift:     -1,
+			want:      Bitvector4{0x01},
+		},
+		{
+			bitvector: Bitvector4{0x03},
+			shift:     -1,
+			want:      Bitvector4{0x01},
+		},
+		{
+			bitvector: Bitvector4{0x03},
+			shift:     3,
+			want:      Bitvector4{0x08},
+		},
+		{
+			bitvector: Bitvector4{0x0F},
+			shift:     -3,
+			want:      Bitvector4{0x01},
+		},
+		{
+			bitvector: Bitvector4{0x0F},
+			shift:     8,
+			want:      Bitvector4{0x00},
+		},
+		{
+			bitvector: Bitvector4{0x0F},
+			shift:     256,
+			want:      Bitvector4{0x00},
+		},
+		{
+			bitvector: Bitvector4{0x0F},
+			shift:     -256,
+			want:      Bitvector4{0x00},
+		},
+	}
+
+	for _, tt := range tests {
+		original := make(Bitvector4, len(tt.bitvector))
+		copy(original, tt.bitvector)
+
+		tt.bitvector.Shift(tt.shift)
+		if !bytes.Equal(tt.bitvector, tt.want) {
+			t.Errorf(
+				"(%x).Shift(%d) = %x, wanted %x",
+				original,
+				tt.shift,
+				tt.bitvector,
+				tt.want,
+			)
+		}
+	}
+}
