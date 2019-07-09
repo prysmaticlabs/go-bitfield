@@ -296,6 +296,10 @@ func TestBitlist_Bytes(t *testing.T) {
 		want    []byte
 	}{
 		{
+			bitlist: Bitlist{},
+			want:    []byte{},
+		},
+		{
 			bitlist: Bitlist{0x01},
 			want:    []byte{},
 		},

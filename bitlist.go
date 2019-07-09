@@ -83,6 +83,10 @@ func (b Bitlist) Len() uint64 {
 // representation of the bitlist. This may produce an empty byte slice if all
 // bits were zero.
 func (b Bitlist) Bytes() []byte {
+	if len(b) == 0 {
+		return []byte{}
+	}
+
 	ret := make([]byte, len(b))
 	copy(ret, b)
 
