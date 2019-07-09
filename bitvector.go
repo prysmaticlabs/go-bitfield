@@ -59,3 +59,24 @@ func (b Bitvector4) Bytes() []byte {
 	}
 	return []byte{b[0] & 0x0F}
 }
+
+// Shift bitvector by i. If i >= 0, perform left shift, otherwise right shift.
+func (b Bitvector4) Shift(i int) {
+	if len(b) == 0 {
+		return
+	}
+
+	// Shifting greater than 4 bits is pointless and can have unexpected behavior.
+	if i > 4 {
+		i = 4
+	} else if i < -4 {
+		i = -4
+	}
+
+	if i >= 0 {
+		b[0] <<= uint8(i)
+	} else {
+		b[0] >>= uint8(i * -1)
+	}
+	b[0] &= 0x0F
+}
