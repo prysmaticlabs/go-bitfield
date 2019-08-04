@@ -140,3 +140,17 @@ func (b Bitlist) Contains(c Bitlist) bool {
 
 	return true
 }
+
+// Or returns the OR result of the two bitfields. This method will panic if the bitlists are not the same length.
+func (b Bitlist) Or(c Bitlist) Bitlist {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	ret := make([]byte, len(b))
+	for i := 0; i < len(b); i++ {
+		ret[i] = b[i]|c[i]
+	}
+
+	return ret
+}
