@@ -518,7 +518,7 @@ func TestBitlist_Or(t *testing.T) {
 	for _, tt := range tests {
 		if !bytes.Equal(tt.a.Or(tt.b), tt.want) {
 			t.Errorf(
-				"(%x).And(%x) = %x, wanted %x",
+				"(%x).Or(%x) = %x, wanted %x",
 				tt.a,
 				tt.b,
 				tt.a.Or(tt.b),
