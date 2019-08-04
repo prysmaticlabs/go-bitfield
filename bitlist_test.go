@@ -397,59 +397,59 @@ func TestBitlist_Count(t *testing.T) {
 }
 
 func TestBitlist_Contains(t *testing.T) {
-	tests := []struct{
-		a Bitlist
-		b Bitlist
+	tests := []struct {
+		a    Bitlist
+		b    Bitlist
 		want bool
 	}{
 		{
-			a: Bitlist{0x02}, // 0b00000010
-			b: Bitlist{0x03}, // 0b00000011
+			a:    Bitlist{0x02}, // 0b00000010
+			b:    Bitlist{0x03}, // 0b00000011
 			want: false,
 		},
 		{
-			a: Bitlist{0x03}, // 0b00000011
-			b: Bitlist{0x03}, // 0b00000011
+			a:    Bitlist{0x03}, // 0b00000011
+			b:    Bitlist{0x03}, // 0b00000011
 			want: true,
 		},
 		{
-			a: Bitlist{0x13}, // 0b00010011
-			b: Bitlist{0x15}, // 0b00010111
+			a:    Bitlist{0x13}, // 0b00010011
+			b:    Bitlist{0x15}, // 0b00010111
 			want: false,
 		},
 		{
-			a: Bitlist{0x1F}, // 0b00011111
-			b: Bitlist{0x13}, // 0b00010011
+			a:    Bitlist{0x1F}, // 0b00011111
+			b:    Bitlist{0x13}, // 0b00010011
 			want: true,
 		},
 		{
-			a: Bitlist{0x1F}, // 0b00011111
-			b: Bitlist{0x13}, // 0b00010011
+			a:    Bitlist{0x1F}, // 0b00011111
+			b:    Bitlist{0x13}, // 0b00010011
 			want: true,
 		},
 		{
-			a: Bitlist{0x1F, 0x03}, // 0b00011111, 0b00000011
-			b: Bitlist{0x13, 0x02}, // 0b00010011, 0b00000010
+			a:    Bitlist{0x1F, 0x03}, // 0b00011111, 0b00000011
+			b:    Bitlist{0x13, 0x02}, // 0b00010011, 0b00000010
 			want: true,
 		},
 		{
-			a: Bitlist{0x1F, 0x01}, // 0b00011111, 0b00000001
-			b: Bitlist{0x93, 0x01}, // 0b10010011, 0b00000001
+			a:    Bitlist{0x1F, 0x01}, // 0b00011111, 0b00000001
+			b:    Bitlist{0x93, 0x01}, // 0b10010011, 0b00000001
 			want: false,
 		},
 		{
-			a: Bitlist{0xFF, 0x02}, // 0b11111111, 0x00000010
-			b: Bitlist{0x13, 0x03}, // 0b00010011, 0x00000011
+			a:    Bitlist{0xFF, 0x02}, // 0b11111111, 0x00000010
+			b:    Bitlist{0x13, 0x03}, // 0b00010011, 0x00000011
 			want: false,
 		},
 		{
-			a: Bitlist{0xFF, 0x85}, // 0b11111111, 0x10000111
-			b: Bitlist{0x13, 0x8F}, // 0b00010011, 0x10001111
+			a:    Bitlist{0xFF, 0x85}, // 0b11111111, 0x10000111
+			b:    Bitlist{0x13, 0x8F}, // 0b00010011, 0x10001111
 			want: false,
 		},
 		{
-			a: Bitlist{0xFF, 0x8F}, // 0b11111111, 0x10001111
-			b: Bitlist{0x13, 0x83}, // 0b00010011, 0x10000011
+			a:    Bitlist{0xFF, 0x8F}, // 0b11111111, 0x10001111
+			b:    Bitlist{0x13, 0x83}, // 0b00010011, 0x10000011
 			want: true,
 		},
 	}
