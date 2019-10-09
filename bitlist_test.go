@@ -467,6 +467,48 @@ func TestBitlist_Contains(t *testing.T) {
 	}
 }
 
+func TestBitlist_Overlaps(t *testing.T) {
+	tests := []struct {
+		a    Bitlist
+		b    Bitlist
+		want bool
+	}{
+		{
+			a:    Bitlist{0x06}, // 0b00000110
+			b:    Bitlist{0x05}, // 0b00000101
+			want: false,
+		},
+		{
+			a:    Bitlist{0x32}, // 0b00110010
+			b:    Bitlist{0x21}, // 0b00100001
+			want: false,
+		},
+		{
+			a:    Bitlist{0x1F}, // 0b00011111
+			b:    Bitlist{0x11}, // 0b00010001
+			want: true,
+		},
+		{
+			a:    Bitlist{0xFF, 0x85}, // 0b11111111, 0x10000111
+			b:    Bitlist{0x13, 0x8F}, // 0b00010011, 0x10001111
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		result := tt.a.Overlaps(tt.b)
+		if result != tt.want {
+			t.Errorf(
+				"(%x).Overlaps(%x) = %t, wanted %t",
+				tt.a,
+				tt.b,
+				result,
+				tt.want,
+			)
+		}
+	}
+}
+
 func TestBitlist_Or(t *testing.T) {
 	tests := []struct {
 		a    Bitlist
