@@ -141,6 +141,26 @@ func (b Bitlist) Contains(c Bitlist) bool {
 	return true
 }
 
+// Overlaps returns true if the bitlist contains one of the bits from the provided argument
+// bitlist. This method will panic if bitlists are not the same length.
+func (b Bitlist) Overlaps(c Bitlist) bool {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	bytes1 := b.Bytes()
+	bytes2 := c.Bytes()
+	// To ensure all of the bits in c are not overlapped in b, we iterate over every byte, invert b
+	// and xor the byte from b and c, then and it against c. If the result is non-zero, then
+	// we can be assured that byte in c had bits not overlapped in b.
+	for i := 0; i < len(bytes1); i++ {
+		if (^bytes1[i]^bytes2[i])&bytes2[i] != 0 {
+			return true
+		}
+	}
+	return false
+}
+
 // Or returns the OR result of the two bitfields. This method will panic if the bitlists are not the same length.
 func (b Bitlist) Or(c Bitlist) Bitlist {
 	if b.Len() != c.Len() {
@@ -149,7 +169,7 @@ func (b Bitlist) Or(c Bitlist) Bitlist {
 
 	ret := make([]byte, len(b))
 	for i := 0; i < len(b); i++ {
-		ret[i] = b[i]|c[i]
+		ret[i] = b[i] | c[i]
 	}
 
 	return ret
