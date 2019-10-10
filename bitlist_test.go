@@ -484,6 +484,11 @@ func TestBitlist_Overlaps(t *testing.T) {
 			want: false,
 		},
 		{
+			a:    Bitlist{0x41}, // 0b00100001
+			b:    Bitlist{0x40}, // 0b00100000
+			want: false,
+		},
+		{
 			a:    Bitlist{0x1F}, // 0b00011111
 			b:    Bitlist{0x11}, // 0b00010001
 			want: true,
