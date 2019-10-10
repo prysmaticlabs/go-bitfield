@@ -151,7 +151,7 @@ func (b Bitlist) Overlaps(c Bitlist) bool {
 	bytes1 := b.Bytes()
 	bytes2 := c.Bytes()
 	if len(bytes1) == 0 || len(bytes2) == 0 {
-		panic("bitlists can not be empty")
+		return false
 	}
 
 	// To ensure all of the bits in c are not overlapped in b, we iterate over every byte, invert b
