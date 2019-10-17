@@ -452,11 +452,6 @@ func TestBitlist_Contains(t *testing.T) {
 			b:    Bitlist{0x13, 0x83}, // 0b00010011, 0x10000011
 			want: true,
 		},
-		{
-			a:    NewBitlist(0),
-			b:    NewBitlist(0),
-			want: false,
-		},
 	}
 
 	for _, tt := range tests {
