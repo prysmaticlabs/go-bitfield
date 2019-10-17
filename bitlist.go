@@ -125,8 +125,13 @@ func (b Bitlist) Count() uint64 {
 // Contains returns true if the bitlist contains all of the bits from the provided argument
 // bitlist. This method will panic if bitlists are not the same length.
 func (b Bitlist) Contains(c Bitlist) bool {
-	if b.Len() != c.Len() {
+	lenB := b.Len()
+	if lenB != c.Len() {
 		panic("bitlists are different lengths")
+	}
+
+	if lenB == 0 {
+		return false
 	}
 
 	// To ensure all of the bits in c are present in b, we iterate over every byte, combine
