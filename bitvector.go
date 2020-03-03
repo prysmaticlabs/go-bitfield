@@ -1,7 +1,6 @@
 package bitfield
 
 import (
-	"encoding/binary"
 	"math/bits"
 )
 
