@@ -1,6 +1,8 @@
 package bitfield
 
-import "math/bits"
+import (
+	"math/bits"
+)
 
 var _ = Bitfield(Bitvector4{})
 
