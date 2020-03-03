@@ -52,6 +52,7 @@ go_library(
         "bitfield.go",
         "bitlist.go",
         "bitvector.go",
+        "bitvector64.go",
         "doc.go",
     ],
     importpath = "github.com/prysmaticlabs/go-bitfield",
@@ -63,6 +64,7 @@ go_test(
     size = "small",
     srcs = [
         "bitlist_test.go",
+        "bitvector64_test.go",
         "bitvector_test.go",
     ],
     embed = [":go_default_library"],
