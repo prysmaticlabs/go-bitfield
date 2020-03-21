@@ -96,3 +96,17 @@ func (b Bitvector64) Shift(i int) {
 		binary.BigEndian.PutUint64(b, num)
 	}
 }
+
+func (b Bitvector64) BitIndices() []int {
+	indices := []int{}
+	for i, bt := range b {
+		for j := 0; j < 8; j++ {
+			bit := byte(1 << uint(j))
+			if bt&bit == bit {
+				indices = append(indices, i*8+j)
+			}
+		}
+	}
+
+	return indices
+}
