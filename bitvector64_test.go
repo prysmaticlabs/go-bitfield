@@ -3,6 +3,7 @@ package bitfield
 import (
 	"bytes"
 	"testing"
+	"reflect"
 )
 
 func TestBitvector64_Len(t *testing.T) {
@@ -323,6 +324,41 @@ func TestBitvector64_Shift(t *testing.T) {
 				original,
 				tt.shift,
 				tt.bitvector,
+				tt.want,
+			)
+		}
+	}
+}
+
+func TestBitVector64_BitIndices(t *testing.T) {
+	tests := []struct {
+		a    Bitvector64
+		want []int
+	}{
+		{
+			a: Bitvector64{0b10010},
+			want: []int{1, 4},
+		},
+		{
+			a: Bitvector64{0b10000},
+			want: []int{4},
+		},
+		{
+			a: Bitvector64{0b10, 0b1},
+			want: []int{1, 8},
+		},
+		{
+			a: Bitvector64{0b11111111, 0b11},
+			want: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+		},
+	}
+
+	for _, tt := range tests {
+		if !reflect.DeepEqual(tt.a.BitIndices(), tt.want) {
+			t.Errorf(
+				"(%0.8b).BitIndices() = %x, wanted %x",
+				tt.a,
+				tt.a.BitIndices(),
 				tt.want,
 			)
 		}

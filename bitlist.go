@@ -185,3 +185,22 @@ func (b Bitlist) Or(c Bitlist) Bitlist {
 
 	return ret
 }
+
+func (b Bitlist) BitIndices() []int {
+	indices := []int{}
+	for i, bt := range b {
+		if i == len(b)-1 {
+			// Clear the most significant bit (the length bit).
+			msb := uint8(bits.Len8(bt)) - 1
+			bt &^= uint8(1 << msb)
+		}
+		for j := 0; j < 8; j++ {
+			bit := byte(1 << uint(j))
+			if bt&bit == bit {
+				indices = append(indices, i*8+j)
+			}
+		}
+	}
+
+	return indices
+}

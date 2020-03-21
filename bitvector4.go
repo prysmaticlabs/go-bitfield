@@ -82,3 +82,17 @@ func (b Bitvector4) Shift(i int) {
 	}
 	b[0] &= 0x0F
 }
+
+func (b Bitvector4) BitIndices() []int {
+	indices := []int{}
+	for i, bt := range b {
+		for j := 0; j < 8; j++ {
+			bit := byte(1 << uint(j))
+			if bt&bit == bit {
+				indices = append(indices, i*8+j)
+			}
+		}
+	}
+
+	return indices
+}
