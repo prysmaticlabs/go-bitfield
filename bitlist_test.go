@@ -3,6 +3,7 @@ package bitfield
 import (
 	"bytes"
 	"testing"
+	"reflect"
 )
 
 func TestNewBitlist(t *testing.T) {
@@ -594,6 +595,41 @@ func TestBitlist_Or(t *testing.T) {
 				tt.a,
 				tt.b,
 				tt.a.Or(tt.b),
+				tt.want,
+			)
+		}
+	}
+}
+
+func TestBitlist_BitIndices(t *testing.T) {
+	tests := []struct {
+		a    Bitlist
+		want []uint
+	}{
+		{
+			a: Bitlist{0b10010},
+			want: []uint{1},
+		},
+		{
+			a: Bitlist{0b10000},
+			want: []uint{},
+		},
+		{
+			a: Bitlist{0b1, 0b10},
+			want: []uint{1},
+		},
+		{
+			a: Bitlist{0b1, 0b11111111},
+			want: []uint{0, 1, 2, 3, 4, 5, 6, 7},
+		},
+	}
+
+	for _, tt := range tests {
+		if !reflect.DeepEqual(tt.a.BitIndices(), tt.want) {
+			t.Errorf(
+				"(%0.8b).BitIndices() = %x, wanted %x",
+				tt.a,
+				tt.a.BitIndices(),
 				tt.want,
 			)
 		}

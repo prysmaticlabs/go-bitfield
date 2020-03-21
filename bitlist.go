@@ -185,3 +185,7 @@ func (b Bitlist) Or(c Bitlist) Bitlist {
 
 	return ret
 }
+
+func (b Bitlist) BitIndices() []uint {
+	return []uint{}
+}
