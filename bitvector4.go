@@ -84,7 +84,7 @@ func (b Bitvector4) Shift(i int) {
 }
 
 func (b Bitvector4) BitIndices() []int {
-	indices := []int{}
+	indices := make([]int, 0, 4)
 	for i, bt := range b {
 		for j := 0; j < 8; j++ {
 			bit := byte(1 << uint(j))
