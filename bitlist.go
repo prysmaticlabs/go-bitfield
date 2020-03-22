@@ -144,11 +144,12 @@ func (b Bitlist) Contains(c Bitlist) bool {
 // Overlaps returns true if the bitlist contains one of the bits from the provided argument
 // bitlist. This method will panic if bitlists are not the same length.
 func (b Bitlist) Overlaps(c Bitlist) bool {
-	if b.Len() != c.Len() {
+	lenB, lenC := b.Len(), c.Len()
+	if lenB != lenC {
 		panic("bitlists are different lengths")
 	}
 
-	if b.Len() == 0 || b.Len() == 0 {
+	if lenB == 0 || lenC == 0 {
 		return false
 	}
 
