@@ -98,7 +98,7 @@ func (b Bitvector64) Shift(i int) {
 }
 
 func (b Bitvector64) BitIndices() []int {
-	indices := []int{}
+	indices := make([]int, 0, 64)
 	for i, bt := range b {
 		for j := 0; j < 8; j++ {
 			bit := byte(1 << uint(j))

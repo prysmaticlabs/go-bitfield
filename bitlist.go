@@ -187,7 +187,7 @@ func (b Bitlist) Or(c Bitlist) Bitlist {
 }
 
 func (b Bitlist) BitIndices() []int {
-	indices := []int{}
+	indices := make([]int, 0, b.Count())
 	for i, bt := range b {
 		if i == len(b)-1 {
 			// Clear the most significant bit (the length bit).
