@@ -187,6 +187,20 @@ func (b Bitlist) Or(c Bitlist) Bitlist {
 	return ret
 }
 
+// And returns the AND result of the two bitfields. This method will panic if the bitlists are not the same length.
+func (b Bitlist) And(c Bitlist) Bitlist {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	ret := make([]byte, len(b))
+	for i := 0; i < len(b); i++ {
+		ret[i] = b[i] & c[i]
+	}
+
+	return ret
+}
+
 func (b Bitlist) BitIndices() []int {
 	indices := make([]int, 0, b.Count())
 	for i, bt := range b {

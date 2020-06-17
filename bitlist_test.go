@@ -2,8 +2,8 @@ package bitfield
 
 import (
 	"bytes"
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func TestNewBitlist(t *testing.T) {
@@ -601,25 +601,86 @@ func TestBitlist_Or(t *testing.T) {
 	}
 }
 
+func TestBitlist_And(t *testing.T) {
+	tests := []struct {
+		a    Bitlist
+		b    Bitlist
+		want Bitlist
+	}{
+		{
+			a:    Bitlist{0x02}, // 0b00000010
+			b:    Bitlist{0x03}, // 0b00000011
+			want: Bitlist{0x02}, // 0b00000010
+		},
+		{
+			a:    Bitlist{0x03}, // 0b00000011
+			b:    Bitlist{0x03}, // 0b00000011
+			want: Bitlist{0x03}, // 0b00000011
+		},
+		{
+			a:    Bitlist{0x13}, // 0b00010011
+			b:    Bitlist{0x15}, // 0b00010101
+			want: Bitlist{0x11}, // 0b00010001
+		},
+		{
+			a:    Bitlist{0x1F}, // 0b00011111
+			b:    Bitlist{0x13}, // 0b00010011
+			want: Bitlist{0x13}, // 0b00010011
+		},
+		{
+			a:    Bitlist{0x1F, 0x03}, // 0b00011111, 0b00000011
+			b:    Bitlist{0x13, 0x02}, // 0b00010011, 0b00000010
+			want: Bitlist{0x13, 0x02}, // 0b00010011, 0b00000010
+		},
+		{
+			a:    Bitlist{0x9F, 0x01}, // 0b10011111, 0b00000001
+			b:    Bitlist{0x93, 0x01}, // 0b10010011, 0b00000001
+			want: Bitlist{0x93, 0x01}, // 0b10010011, 0b00000001
+		},
+		{
+			a:    Bitlist{0xFF, 0x02}, // 0b11111111, 0x00000010
+			b:    Bitlist{0x13, 0x03}, // 0b00010011, 0x00000011
+			want: Bitlist{0x13, 0x02}, // 0b00010011, 0x00000010
+		},
+		{
+			a:    Bitlist{0xFF, 0x87}, // 0b11111111, 0x10000111
+			b:    Bitlist{0x13, 0x8F}, // 0b00010011, 0x10001111
+			want: Bitlist{0x13, 0x87}, // 0b00010011, 0x10000111
+		},
+	}
+
+	for _, tt := range tests {
+		if !bytes.Equal(tt.a.And(tt.b), tt.want) {
+			t.Errorf(
+				"(%x).And(%x) = %x, wanted %x",
+				tt.a,
+				tt.b,
+				tt.a.And(tt.b),
+				tt.want,
+			)
+		}
+	}
+}
+
 func TestBitlist_BitIndices(t *testing.T) {
 	tests := []struct {
 		a    Bitlist
 		want []int
 	}{
 		{
-			a: Bitlist{0b10010},
+			a:    Bitlist{0b10010},
 			want: []int{1},
 		},
 		{
-			a: Bitlist{0b10000},
+			a:    Bitlist{0b10000},
 			want: []int{},
 		},
 		{
-			a: Bitlist{0b10, 0b1},
+			a:    Bitlist{0b10, 0b1},
 			want: []int{1},
 		},
 		{
-			a: Bitlist{0b11111111, 0b11},
+			a:    Bitlist{0b11111111, 0b11},
 			want: []int{0, 1, 2, 3, 4, 5, 6, 7, 8},
 		},
 	}
