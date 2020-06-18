@@ -672,55 +672,57 @@ func TestBitlist_Xor(t *testing.T) {
 		{
 			a:    Bitlist{0x02}, // 0b00000010
 			b:    Bitlist{0x03}, // 0b00000011
-			want: Bitlist{0x01}, // 0b00000001
+			want: Bitlist{0x03}, // 0b00000011
 		},
 		{
 			a:    Bitlist{0x03}, // 0b00000011
 			b:    Bitlist{0x03}, // 0b00000011
-			want: Bitlist{0x00}, // 0b00000000
+			want: Bitlist{0x02}, // 0b00000010
 		},
 		{
 			a:    Bitlist{0x13}, // 0b00010011
 			b:    Bitlist{0x15}, // 0b00010101
-			want: Bitlist{0x06}, // 0b00000110
+			want: Bitlist{0x16}, // 0b00010110
 		},
 		{
 			a:    Bitlist{0x1F}, // 0b00011111
 			b:    Bitlist{0x13}, // 0b00010011
-			want: Bitlist{0x0c}, // 0b00001100
+			want: Bitlist{0x1c}, // 0b00011100
 		},
 		{
 			a:    Bitlist{0x1F, 0x03}, // 0b00011111, 0b00000011
 			b:    Bitlist{0x13, 0x02}, // 0b00010011, 0b00000010
-			want: Bitlist{0x0c, 0x01}, // 0b00001100, 0b00000001
+			want: Bitlist{0x0c, 0x03}, // 0b00001100, 0b00000011
 		},
 		{
 			a:    Bitlist{0x9F, 0x01}, // 0b10011111, 0b00000001
 			b:    Bitlist{0x93, 0x01}, // 0b10010011, 0b00000001
-			want: Bitlist{0x0c, 0x00}, // 0b00001100, 0b00000000
+			want: Bitlist{0x0c, 0x01}, // 0b00001100, 0b00000001
 		},
 		{
 			a:    Bitlist{0xFF, 0x02}, // 0b11111111, 0x00000010
 			b:    Bitlist{0x13, 0x03}, // 0b00010011, 0x00000011
-			want: Bitlist{0xec, 0x01}, // 0b11101100, 0x00000001
+			want: Bitlist{0xec, 0x03}, // 0b11101100, 0x00000011
 		},
 		{
 			a:    Bitlist{0xFF, 0x87}, // 0b11111111, 0x10000111
 			b:    Bitlist{0x13, 0x8F}, // 0b00010011, 0x10001111
-			want: Bitlist{0xec, 0x08}, // 0b11101100, 0x00001000
+			want: Bitlist{0xec, 0x88}, // 0b11101100, 0x10001000
 		},
 	}
 
 	for _, tt := range tests {
-		if !bytes.Equal(tt.a.Xor(tt.b), tt.want) {
-			t.Errorf(
-				"(%x).Xor(%x) = %x, wanted %x",
-				tt.a,
-				tt.b,
-				tt.a.Xor(tt.b),
-				tt.want,
-			)
-		}
+		t.Run(fmt.Sprintf("(%x).Xor(%x)", tt.a, tt.b), func(t *testing.T) {
+			if !bytes.Equal(tt.a.Xor(tt.b), tt.want) {
+				t.Errorf(
+					"(%x).Xor(%x) = %x, wanted %x",
+					tt.a,
+					tt.b,
+					tt.a.Xor(tt.b),
+					tt.want,
+				)
+			}
+		})
 	}
 }
 
