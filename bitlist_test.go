@@ -2,6 +2,7 @@ package bitfield
 
 import (
 	"bytes"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -729,48 +730,70 @@ func TestBitlist_Not(t *testing.T) {
 		want Bitlist
 	}{
 		{
+			a:    Bitlist{0x01}, // 0b00000001
+			want: Bitlist{0x01}, // 0b00000001
+		},
+		{
 			a:    Bitlist{0x02}, // 0b00000010
-			want: Bitlist{0xfd}, // 0b11111101
+			want: Bitlist{0x03}, // 0b00000011
+		},
+		{
+			a:    Bitlist{0x03}, // 0b00000011
+			want: Bitlist{0x02}, // 0b00000010
+		},
+		{
+			a:    Bitlist{0x05}, // 0b00000101
+			want: Bitlist{0x06}, // 0b00000110
+		},
+		{
+			a:    Bitlist{0x06}, // 0b00000110
+			want: Bitlist{0x05}, // 0b00000101
 		},
 		{
 			a:    Bitlist{0x83}, // 0b10000011
-			want: Bitlist{0x7c}, // 0b01111100
+			want: Bitlist{0xfc}, // 0b11111100
 		},
 		{
 			a:    Bitlist{0x13}, // 0b00010011
-			want: Bitlist{0xec}, // 0b11101100
+			want: Bitlist{0x1c}, // 0b00011100
 		},
 		{
 			a:    Bitlist{0x1F}, // 0b00011111
-			want: Bitlist{0xe0}, // 0b11100000
+			want: Bitlist{0x10}, // 0b00010000
 		},
 		{
 			a:    Bitlist{0x1F, 0x03}, // 0b00011111, 0b00000011
-			want: Bitlist{0xe0, 0xfc}, // 0b11100000, 0b11111100
+			want: Bitlist{0xe0, 0x02}, // 0b11100000, 0b00000010
 		},
 		{
 			a:    Bitlist{0x9F, 0x01}, // 0b10011111, 0b00000001
-			want: Bitlist{0x60, 0xfe}, // 0b01100000, 0b11111110
+			want: Bitlist{0x60, 0x01}, // 0b01100000, 0b00000001
 		},
 		{
 			a:    Bitlist{0xFF, 0x02}, // 0b11111111, 0x00000010
-			want: Bitlist{0x00, 0xfd}, // 0b00000000, 0x11111101
+			want: Bitlist{0x00, 0x03}, // 0b00000000, 0x00000011
 		},
 		{
 			a:    Bitlist{0xFF, 0x87}, // 0b11111111, 0x10000111
-			want: Bitlist{0x00, 0x78}, // 0b00000000, 0x01111000
+			want: Bitlist{0x00, 0xf8}, // 0b00000000, 0x11111000
+		},
+		{
+			a:    Bitlist{0xFF, 0x07}, // 0b11111111, 0x00000111
+			want: Bitlist{0x00, 0x04}, // 0b00000000, 0x00000100
 		},
 	}
 
 	for _, tt := range tests {
-		if !bytes.Equal(tt.a.Not(), tt.want) {
-			t.Errorf(
-				"(%x).Not() = %x, wanted %x",
-				tt.a,
-				tt.a.Not(),
-				tt.want,
-			)
-		}
+		t.Run(fmt.Sprintf("(%#x).Not()", tt.a), func(t *testing.T) {
+			if !bytes.Equal(tt.a.Not(), tt.want) {
+				t.Errorf(
+					"(%x).Not() = %x, wanted %x",
+					tt.a,
+					tt.a.Not(),
+					tt.want,
+				)
+			}
+		})
 	}
 }
 

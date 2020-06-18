@@ -217,9 +217,23 @@ func (b Bitlist) Xor(c Bitlist) Bitlist {
 
 // Not returns the NOT result of the bitfield.
 func (b Bitlist) Not() Bitlist {
+	if b.Len() == 0 {
+		return b
+	}
 	ret := make([]byte, len(b))
-	for i := 0; i < len(b); i++ {
+
+	// Process all bytes but the last.
+	for i := 0; i < len(b)-1; i++ {
 		ret[i] = ^b[i]
+	}
+
+	// For the last byte, process only bits smaller than the length bit.
+	ret[len(b)-1] = b[len(b)-1]
+	msb := uint8(bits.Len8(b[len(b)-1])) - 1
+	if msb > 0 {
+		mask := ^uint8(0xff >> (8 - msb))
+		ret[len(b)-1] = ^(b[len(b)-1]) ^ mask
+		ret[len(b)-1] |= uint8(1 << msb)
 	}
 
 	return ret
