@@ -25,7 +25,7 @@ func (b Bitvector1024) BitAt(idx uint64) bool {
 		return false
 	}
 
-	i := uint8(1 << (idx%8))
+	i := uint8(1 << (idx % 8))
 	return b[idx/8]&i == i
 }
 
@@ -46,7 +46,7 @@ func (b Bitvector1024) SetBitAt(idx uint64, val bool) {
 	}
 }
 
-// Len returns a constant length 64.
+// Len returns a constant length 1024.
 func (b Bitvector1024) Len() uint64 {
 	return uint64(len(b) * 8)
 }
@@ -63,7 +63,7 @@ func (b Bitvector1024) Count() uint64 {
 	return uint64(c)
 }
 
-// Bytes returns the bytes data representing the bitvector64. This method
+// Bytes returns the bytes data representing the Bitvector1024. This method
 // bitmasks the underlying data to ensure that it is an accurate representation.
 func (b Bitvector1024) Bytes() []byte {
 	if len(b) == 0 {
@@ -97,6 +97,7 @@ func (b Bitvector1024) Shift(i int) {
 	}
 }
 
+// BitIndices returns the list of indices that are set to 1.
 func (b Bitvector1024) BitIndices() []int {
 	indices := make([]int, 0, 1024)
 	for i, bt := range b {
