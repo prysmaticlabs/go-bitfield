@@ -9,7 +9,7 @@ import (
 func TestBitvector1024_Len(t *testing.T) {
 	bv := NewBitvector1024()
 	if bv.Len() != 1024 {
-		t.Errorf("(%x).Len() = %d, wanted %d", bv, bv.Len(), 64)
+		t.Errorf("(%x).Len() = %d, wanted %d", bv, bv.Len(), 1024)
 	}
 }
 
