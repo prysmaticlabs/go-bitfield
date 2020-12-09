@@ -63,7 +63,7 @@ func (b Bitvector1024) Count() uint64 {
 	return uint64(c)
 }
 
-// Bytes returns the bytes data representing the bitvector64. This method
+// Bytes returns the bytes data representing the Bitvector1024. This method
 // bitmasks the underlying data to ensure that it is an accurate representation.
 func (b Bitvector1024) Bytes() []byte {
 	if len(b) == 0 {
