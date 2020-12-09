@@ -46,7 +46,7 @@ func (b Bitvector64) SetBitAt(idx uint64, val bool) {
 	}
 }
 
-// Len returns a constant length 64.
+// Len returns the number of bits in the bitvector.
 func (b Bitvector64) Len() uint64 {
 	return uint64(len(b) * 8)
 }
