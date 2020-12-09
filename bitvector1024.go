@@ -11,7 +11,7 @@ var _ = Bitfield(Bitvector1024{})
 // present in the underlying byte array.
 type Bitvector1024 []byte
 
-// NewBitvector1024 creates a new bitvector of size 64.
+// NewBitvector1024 creates a new bitvector of size 1024.
 func NewBitvector1024() Bitvector1024 {
 	byteArray := [128]byte{}
 	return byteArray[:]
