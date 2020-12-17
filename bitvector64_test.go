@@ -2,8 +2,8 @@ package bitfield
 
 import (
 	"bytes"
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func TestBitvector64_Len(t *testing.T) {
@@ -336,19 +336,19 @@ func TestBitVector64_BitIndices(t *testing.T) {
 		want []int
 	}{
 		{
-			a: Bitvector64{0b10010},
+			a:    Bitvector64{0b10010},
 			want: []int{1, 4},
 		},
 		{
-			a: Bitvector64{0b10000},
+			a:    Bitvector64{0b10000},
 			want: []int{4},
 		},
 		{
-			a: Bitvector64{0b10, 0b1},
+			a:    Bitvector64{0b10, 0b1},
 			want: []int{1, 8},
 		},
 		{
-			a: Bitvector64{0b11111111, 0b11},
+			a:    Bitvector64{0b11111111, 0b11},
 			want: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 		},
 	}

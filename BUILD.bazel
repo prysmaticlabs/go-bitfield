@@ -51,6 +51,7 @@ go_library(
     srcs = [
         "bitfield.go",
         "bitlist.go",
+        "bitvector1024.go",
         "bitvector4.go",
         "bitvector64.go",
         "doc.go",
@@ -64,6 +65,7 @@ go_test(
     size = "small",
     srcs = [
         "bitlist_test.go",
+        "bitvector1024_test.go",
         "bitvector4_test.go",
         "bitvector64_test.go",
     ],
