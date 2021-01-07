@@ -71,6 +71,9 @@ func (b Bitlist) Len() uint64 {
 
 	// Determine the position of the most significant bit.
 	msb := bits.Len8(last)
+	if msb == 0 {
+		return 0
+	}
 
 	// The absolute position of the most significant bit will be the number of
 	// bits in the preceding bytes plus the position of the most significant
