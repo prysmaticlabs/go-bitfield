@@ -61,6 +61,10 @@ func TestBitlist_Len(t *testing.T) {
 			want:    0,
 		},
 		{
+			bitlist: Bitlist{0x00}, // 0b00000000, invalid list
+			want:    0,
+		},
+		{
 			bitlist: Bitlist{0x01}, // 0b00000001
 			want:    0,
 		},
@@ -302,6 +306,10 @@ func TestBitlist_Bytes(t *testing.T) {
 			want:    []byte{},
 		},
 		{
+			bitlist: Bitlist{0x00},
+			want:    []byte{},
+		},
+		{
 			bitlist: Bitlist{0x01},
 			want:    []byte{},
 		},
@@ -362,6 +370,10 @@ func TestBitlist_Count(t *testing.T) {
 	}{
 		{
 			bitlist: Bitlist{},
+			want:    0,
+		},
+		{
+			bitlist: Bitlist{0x00}, // 0b00000000, invalid list
 			want:    0,
 		},
 		{
