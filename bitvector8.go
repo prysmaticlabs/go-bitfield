@@ -55,7 +55,7 @@ func (b Bitvector8) Count() uint64 {
 	if len(b) == 0 {
 		return 0
 	}
-	return uint64(bits.OnesCount8(b.Bytes()[0]))
+	return uint64(bits.OnesCount8(b[0])
 }
 
 // Bytes returns the bytes data representing the Bitvector8. This method
