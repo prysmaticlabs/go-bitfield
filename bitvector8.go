@@ -64,7 +64,7 @@ func (b Bitvector8) Bytes() []byte {
 	if len(b) == 0 {
 		return []byte{}
 	}
-	return []byte{b[0]}
+	return b
 }
 
 // BitIndices returns the list of indices that are set to 1.
