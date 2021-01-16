@@ -473,3 +473,54 @@ func TestBitlist_SetBitAt(t *testing.T) {
 		}
 	}
 }
+
+func TestBitlist_Count(t *testing.T) {
+	tests := []struct {
+		bitlist *Bitlist
+		want    uint64
+	}{
+		{
+			bitlist: NewBitlistFrom([]uint64{}),
+			want:    0,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x00}), // 0b00000000
+			want:    0,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x01}), // 0b00000001
+			want:    1,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x03}), // 0b00000011
+			want:    2,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x0F}), // 0b00001111
+			want:    4,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x0F, 0x01}), // 0b00001111, 0b00000001
+			want:    5,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x0F, 0x03}), // 0b00001111, 0b00000011
+			want:    6,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x0F, 0x00, 0x03}), // 0b00001111, 0b00000011
+			want:    6,
+		},
+	}
+
+	for _, tt := range tests {
+		if tt.bitlist.Count() != tt.want {
+			t.Errorf(
+				"(%+v).Count() = %d, wanted %d",
+				tt.bitlist,
+				tt.bitlist.Count(),
+				tt.want,
+			)
+		}
+	}
+}
