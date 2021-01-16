@@ -2,9 +2,6 @@ package bitfield
 
 import "math/bits"
 
-// todo enable
-//var _ = Bitfield(&Bitlist{})
-
 const (
 	// wordSize configures how many bits are there in a single element of bitlist array.
 	wordSize = uint64(64)
@@ -33,6 +30,35 @@ func NewBitlistFrom(data []uint64) *Bitlist {
 	return &Bitlist{
 		size: uint64(len(data)) * wordSize,
 		data: data,
+	}
+}
+
+// BitAt returns the bit value at the given index. If the index requested
+// exceeds the number of bits in the bitlist, then this method returns false.
+func (b *Bitlist) BitAt(idx uint64) bool {
+	// Out of bounds, must be false.
+	if idx >= b.size {
+		return false
+	}
+
+	i := uint64(1 << (idx % wordSize))
+	return b.data[idx>>wordSizeLog2]&i == i
+}
+
+// SetBitAt will set the bit at the given index to the given value. If the index
+// requested exceeds the number of bits in the bitlist, then this method returns
+// false.
+func (b *Bitlist) SetBitAt(idx uint64, val bool) {
+	// Out of bounds, do nothing.
+	if idx >= b.size {
+		return
+	}
+
+	bit := uint64(1 << (idx % wordSize))
+	if val {
+		b.data[idx>>wordSizeLog2] |= bit
+	} else {
+		b.data[idx>>wordSizeLog2] &^= bit
 	}
 }
 

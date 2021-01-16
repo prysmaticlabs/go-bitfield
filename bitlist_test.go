@@ -117,26 +117,26 @@ func TestBitlist_NewBitlistFrom(t *testing.T) {
 			want: &Bitlist{size: 64, data: []uint64{0x001002000c002000}},
 		},
 		{
-			from: []uint64{0xffffffffffffffff},
-			want: &Bitlist{size: 64, data: []uint64{0xffffffffffffffff}},
+			from: []uint64{0xFFFFFFFFFFFFFFFF},
+			want: &Bitlist{size: 64, data: []uint64{0xFFFFFFFFFFFFFFFF}},
 		},
 		{
 			from: []uint64{0x0000000000000000, 0x0000000000000000},
 			want: &Bitlist{size: 128, data: []uint64{0x00, 0x00}},
 		},
 		{
-			from: []uint64{0xffffffffffffffff, 0xffffffffffffffff},
-			want: &Bitlist{size: 128, data: []uint64{0xffffffffffffffff, 0xffffffffffffffff}},
+			from: []uint64{0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF},
+			want: &Bitlist{size: 128, data: []uint64{0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF}},
 		},
 		{
 			from: []uint64{0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000},
 			want: &Bitlist{size: 256, data: []uint64{0x00, 0x00, 0x00, 0x00}},
 		},
 		{
-			from: []uint64{0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff},
+			from: []uint64{0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF},
 			want: &Bitlist{
 				size: 256,
-				data: []uint64{0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff},
+				data: []uint64{0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF},
 			},
 		},
 		{
@@ -154,39 +154,39 @@ func TestBitlist_NewBitlistFrom(t *testing.T) {
 		},
 		{
 			from: []uint64{
-				0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-				0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
+				0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+				0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
 			},
 			want: &Bitlist{
 				size: 512,
 				data: []uint64{
-					0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-					0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
+					0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+					0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
 				},
 			},
 		},
 		{
 			from: []uint64{
-				0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-				0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-				0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-				0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-				0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-				0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-				0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-				0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
+				0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+				0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+				0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+				0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+				0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+				0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+				0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+				0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
 			},
 			want: &Bitlist{
 				size: 2048,
 				data: []uint64{
-					0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-					0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-					0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-					0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-					0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-					0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-					0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
-					0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc, 0x1111ffffffffcccc,
+					0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+					0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+					0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+					0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+					0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+					0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+					0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
+					0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0x1111FFFFFFFFCCCC, 0X1111FFFFFFFFCCCC,
 				},
 			},
 		},
@@ -260,6 +260,216 @@ func TestBitlist_Len(t *testing.T) {
 	for _, tt := range tests {
 		if tt.bitlist.Len() != tt.want {
 			t.Errorf("(%+v).Len() = %d, wanted %d", tt.bitlist, tt.bitlist.Len(), tt.want)
+		}
+	}
+}
+
+func TestBitlist_BitAt(t *testing.T) {
+	tests := []struct {
+		bitlist []uint64
+		idx     uint64
+		want    bool
+	}{
+		{
+			bitlist: []uint64{},
+			idx:     0,
+			want:    false,
+		},
+		{
+			bitlist: []uint64{0x01},
+			idx:     64, // Out of bounds
+			want:    false,
+		},
+		{
+			bitlist: []uint64{0x01},
+			idx:     163465, // Out of bounds
+			want:    false,
+		},
+		{
+			bitlist: []uint64{0x01},
+			idx:     0,
+			want:    true,
+		},
+		{
+			bitlist: []uint64{0x0E}, // 0b00001110
+			idx:     0,              //          ^
+			want:    false,
+		},
+		{
+			bitlist: []uint64{0x0E}, // 0b00001110
+			idx:     1,              //         ^
+			want:    true,
+		},
+		{
+			bitlist: []uint64{0x0E}, // 0b00001110
+			idx:     2,              //        ^
+			want:    true,
+		},
+		{
+			bitlist: []uint64{0x0E}, // 0b00001110
+			idx:     3,              //       ^
+			want:    true,
+		},
+		{
+			bitlist: []uint64{0x0E}, // 0b00001110
+			idx:     4,              //      ^
+			want:    false,
+		},
+		{
+			bitlist: []uint64{0xFF, 0x0F}, // 0b11111111, 0b00001111
+			idx:     4,                    //      ^
+			want:    true,
+		},
+		{
+			bitlist: []uint64{0x00, 0x0F}, // 0b00000000, 0b00001111
+			idx:     67,                   //                   ^
+			want:    true,
+		},
+		{
+			bitlist: []uint64{0xFF, 0x0F}, // 0b11111111, 0b00001111
+			idx:     68,                   //                  ^
+			want:    false,
+		},
+		{
+			bitlist: []uint64{0x00, 0x00, 0b00000100}, // 0b0, 0b0, 0b00000100
+			idx:     130,                              //                  ^
+			want:    true,
+		},
+		{
+			bitlist: []uint64{0x00, 0x00, 0b00000100}, // 0b0, 0b0, 0b00000100
+			idx:     129,                              //                   ^
+			want:    false,
+		},
+		{
+			bitlist: []uint64{0x00, 0x00, 0b00000100}, // 0b0, 0b0, 0b00000100
+			idx:     131,                              //                 ^
+			want:    false,
+		},
+	}
+
+	for _, tt := range tests {
+		if NewBitlistFrom(tt.bitlist).BitAt(tt.idx) != tt.want {
+			t.Errorf(
+				"(%#b).BitAt(%d) = %t, wanted %t",
+				tt.bitlist,
+				tt.idx,
+				NewBitlistFrom(tt.bitlist).BitAt(tt.idx),
+				tt.want,
+			)
+		}
+	}
+}
+
+func TestBitlist_SetBitAt(t *testing.T) {
+	tests := []struct {
+		bitlist []uint64
+		idx     uint64
+		val     bool
+		want    []uint64
+	}{
+		{
+			bitlist: []uint64{},
+			idx:     0,
+			val:     true,
+			want:    []uint64{},
+		},
+		{
+			bitlist: []uint64{0x01}, // 0b00000001
+			idx:     0,              //          ^
+			val:     true,
+			want:    []uint64{0x01}, // 0b00000001
+		},
+		{
+			bitlist: []uint64{0x01}, // 0b00000001
+			idx:     1,              //         ^
+			val:     true,
+			want:    []uint64{0x03}, // 0b00000011
+		},
+		{
+			bitlist: []uint64{0x01}, // 0b00000001
+			idx:     2,              //        ^
+			val:     true,
+			want:    []uint64{0x05}, // 0b00000101
+		},
+		{
+			bitlist: []uint64{0x02}, // 0b00000010
+			idx:     0,              //          ^
+			val:     true,
+			want:    []uint64{0x03}, // 0b00000011
+		},
+		{
+			bitlist: []uint64{0x10}, // 0b00010000
+			idx:     0,              //          ^
+			val:     true,
+			want:    []uint64{0x11}, // 0b00010001
+		},
+		{
+			bitlist: []uint64{0x10}, // 0b00010000
+			idx:     64,             // Out of bounds
+			val:     true,
+			want:    []uint64{0x10}, // 0b00010000
+		},
+		{
+			bitlist: []uint64{0x10}, // 0b00010000
+			idx:     63,
+			val:     true,
+			want:    []uint64{0x8000000000000010}, // 0b1000..010000
+		},
+		{
+			bitlist: []uint64{0x1F}, // 0b00011111
+			idx:     0,              //          ^
+			val:     true,
+			want:    []uint64{0x1F}, // 0b00011111
+		},
+		{
+			bitlist: []uint64{0x1F}, // 0b00011111
+			idx:     1,              //         ^
+			val:     false,
+			want:    []uint64{0x1D}, // 0b00011101
+		},
+		{
+			bitlist: []uint64{0x1F}, // 0b00011111
+			idx:     4,              //      ^
+			val:     false,
+			want:    []uint64{0x0F}, // 0b00001111
+		},
+		{
+			bitlist: []uint64{0x1F}, // 0b00011111
+			idx:     64,             // Out of bounds
+			val:     false,
+			want:    []uint64{0x1F}, // 0b00011111
+		},
+		{
+			bitlist: []uint64{0x1F, 0x01}, // 0b00011111, 0b00000001
+			idx:     0,                    //          ^
+			val:     true,
+			want:    []uint64{0x1F, 0x01}, // 0b00011111, 0b00000001
+		},
+		{
+			bitlist: []uint64{0x1F, 0x01}, // 0b00011111, 0b00000001
+			idx:     0,                    //          ^
+			val:     false,
+			want:    []uint64{0x1E, 0x01}, // 0b00011110, 0b00000001
+		},
+		{
+			bitlist: []uint64{0x00, 0x10}, // 0b00000000, 0b00010000
+			idx:     64,                   //                      ^
+			val:     true,
+			want:    []uint64{0x00, 0x11}, // 0b00000000, 0b00010001
+		},
+		{
+			bitlist: []uint64{0x00, 0x11}, // 0b00000000, 0b00010001
+			idx:     64,                   //                      ^
+			val:     false,
+			want:    []uint64{0x00, 0x10}, // 0b00000000, 0b00010000
+		},
+	}
+
+	for _, tt := range tests {
+		s := NewBitlistFrom(tt.bitlist)
+		s.SetBitAt(tt.idx, tt.val)
+		if !reflect.DeepEqual(tt.want, s.data) {
+			t.Errorf("(%+v).SetBitAt(%d, %t) = %x, wanted %x", s, tt.idx, tt.val, tt.bitlist, tt.want)
 		}
 	}
 }

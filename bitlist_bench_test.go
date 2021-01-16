@@ -32,18 +32,46 @@ func BenchmarkBitlist_Len(b *testing.B) {
 		b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
 			b.Run("[]byte", func(b *testing.B) {
 				b.StopTimer()
-				set := NewByteBitlist(n)
+				s := NewByteBitlist(n)
 				b.StartTimer()
 				for i := 0; i < b.N; i++ {
-					set.Len()
+					s.Len()
 				}
 			})
 			b.Run("[]uint64", func(b *testing.B) {
 				b.StopTimer()
-				set := NewBitlist(n)
+				s := NewBitlist(n)
 				b.StartTimer()
 				for i := 0; i < b.N; i++ {
-					set.Len()
+					s.Len()
+				}
+			})
+		})
+	}
+}
+
+func BenchmarkBitlist_SetBitAt(b *testing.B) {
+	for n := uint64(0); n <= 2048; n += 1024 {
+		idx := n / 2
+		b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
+			b.Run("[]byte", func(b *testing.B) {
+				b.StopTimer()
+				s := NewByteBitlist(n)
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.BitAt(idx)
+					s.SetBitAt(idx, true)
+					s.SetBitAt(idx, false)
+				}
+			})
+			b.Run("[]uint64", func(b *testing.B) {
+				b.StopTimer()
+				s := NewBitlist(n)
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.BitAt(idx)
+					s.SetBitAt(idx, true)
+					s.SetBitAt(idx, false)
 				}
 			})
 		})
