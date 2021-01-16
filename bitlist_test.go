@@ -201,3 +201,65 @@ func TestBitlist_NewBitlistFrom(t *testing.T) {
 		})
 	}
 }
+
+func TestBitlist_Len(t *testing.T) {
+	tests := []struct {
+		bitlist *Bitlist
+		want    uint64
+	}{
+		{
+			bitlist: NewBitlist(0),
+			want:    0,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{}),
+			want:    0,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x00}),
+			want:    wordSize,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x01}),
+			want:    wordSize,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x02}),
+			want:    wordSize,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x08}),
+			want:    wordSize,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x0E}),
+			want:    wordSize,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x0F}),
+			want:    wordSize,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x00, 0x01}),
+			want:    wordSize * 2,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x00, 0x02}),
+			want:    wordSize * 2,
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x00, 0x02, 0x08}),
+			want:    wordSize * 3,
+		},
+		{
+			bitlist: NewBitlistFrom(make([]uint64, 2048)),
+			want:    wordSize * 2048,
+		},
+	}
+
+	for _, tt := range tests {
+		if tt.bitlist.Len() != tt.want {
+			t.Errorf("(%+v).Len() = %d, wanted %d", tt.bitlist, tt.bitlist.Len(), tt.want)
+		}
+	}
+}
