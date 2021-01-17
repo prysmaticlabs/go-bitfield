@@ -540,21 +540,22 @@ func TestBitlist_Bytes(t *testing.T) {
 			},
 		},
 		{
+			bitlist: NewBitlistFrom([]uint64{0x01, 0x00}),
+			want:    []byte{0x01},
+		},
+		{
 			bitlist: NewBitlistFrom([]uint64{0x0807060504030201, 0x02}),
 			want:    []byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x02},
 		},
 	}
 
 	for _, tt := range tests {
-		got := tt.bitlist.Bytes()
-		if !bytes.Equal(got, tt.want) {
-			t.Errorf(
-				"(%+v).Bytes() = %x, wanted %x",
-				tt.bitlist,
-				got,
-				tt.want,
-			)
-		}
+		t.Run(fmt.Sprintf("bitlist:%+v", tt.bitlist), func(t *testing.T) {
+			got := tt.bitlist.Bytes()
+			if !bytes.Equal(got, tt.want) {
+				t.Errorf("(%+v).Bytes() = %x, wanted %x", tt.bitlist, got, tt.want)
+			}
+		})
 	}
 }
 
