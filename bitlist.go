@@ -1,6 +1,8 @@
 package bitfield
 
-import "math/bits"
+import (
+	"math/bits"
+)
 
 const (
 	// wordSize configures how many bits are there in a single element of bitlist array.
@@ -8,6 +10,8 @@ const (
 	// wordSizeLog2 allows optimized division by wordSize using right shift (numBits >> wordSizeLog2).
 	// Note: log_2(64) = 6.
 	wordSizeLog2 = uint64(6)
+	// bytesInWord defines how many bytes are there in a single word i.e. wordSize/8.
+	bytesInWord = 8
 )
 
 // Bitlist is a bitfield implementation backed by an array of uint64.
@@ -18,10 +22,9 @@ type Bitlist struct {
 
 // NewBitlist creates a new bitlist of size N.
 func NewBitlist(n uint64) *Bitlist {
-	numWords := numWordsRequired(n)
 	return &Bitlist{
 		size: n,
-		data: make([]uint64, numWords, numWords),
+		data: make([]uint64, numWordsRequired(n)),
 	}
 }
 
@@ -65,6 +68,34 @@ func (b *Bitlist) SetBitAt(idx uint64, val bool) {
 // Len returns the number of bits in a bitlist (note that underlying array can be bigger).
 func (b *Bitlist) Len() uint64 {
 	return b.size
+}
+
+// Bytes returns underlying array of uint64s as an array of bytes.
+// The leading zeros in the bitlist will be trimmed to the smallest byte length
+// representation of the bitlist. This may produce an empty byte slice if all
+// bits were zero.
+func (b *Bitlist) Bytes() []byte {
+	if len(b.data) == 0 {
+		return []byte{}
+	}
+
+	ret := make([]byte, len(b.data)*bytesInWord)
+	for idx, word := range b.data {
+		for i := uint64(0); i < 8; i++ {
+			ret[uint64(idx)*bytesInWord+i] = byte((word >> (i * 8)) & 0xff)
+		}
+	}
+
+	// Clear any leading zero bytes.
+	newLen := len(ret)
+	for i := len(ret) - 1; i >= 0; i-- {
+		if ret[i] != 0x00 {
+			break
+		}
+		newLen = i
+	}
+
+	return ret[:newLen]
 }
 
 // Count returns the number of 1s in the bitlist.

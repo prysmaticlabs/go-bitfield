@@ -1,6 +1,7 @@
 package bitfield
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 	"testing"
@@ -470,6 +471,89 @@ func TestBitlist_SetBitAt(t *testing.T) {
 		s.SetBitAt(tt.idx, tt.val)
 		if !reflect.DeepEqual(tt.want, s.data) {
 			t.Errorf("(%+v).SetBitAt(%d, %t) = %x, wanted %x", s, tt.idx, tt.val, tt.bitlist, tt.want)
+		}
+	}
+}
+
+func TestBitlist_Bytes(t *testing.T) {
+	tests := []struct {
+		bitlist *Bitlist
+		want    []byte
+	}{
+		{
+			bitlist: NewBitlistFrom([]uint64{}),
+			want:    []byte{},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x00}),
+			want:    []byte{},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x01}),
+			want:    []byte{0x01},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x02}),
+			want:    []byte{0x02},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x03}),
+			want:    []byte{0x03},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x12}),
+			want:    []byte{0x12},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x02, 0x01}),
+			want:    []byte{0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x02, 0x02}),
+			want:    []byte{0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x02, 0x03}),
+			want:    []byte{0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x01, 0x00, 0x00}),
+			want:    []byte{0x01},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x01, 0x00, 0x001F00}),
+			want: []byte{
+				0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x1F,
+			},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x00, 0x00, 0x00}),
+			want:    []byte{},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x00, 0x01, 0x00}),
+			want: []byte{
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x01,
+			},
+		},
+		{
+			bitlist: NewBitlistFrom([]uint64{0x0807060504030201, 0x02}),
+			want:    []byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x02},
+		},
+	}
+
+	for _, tt := range tests {
+		got := tt.bitlist.Bytes()
+		if !bytes.Equal(got, tt.want) {
+			t.Errorf(
+				"(%+v).Bytes() = %x, wanted %x",
+				tt.bitlist,
+				got,
+				tt.want,
+			)
 		}
 	}
 }
