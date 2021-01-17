@@ -609,3 +609,70 @@ func TestBitlist_Count(t *testing.T) {
 		}
 	}
 }
+
+func TestBitlist_Contains(t *testing.T) {
+	tests := []struct {
+		a    *Bitlist
+		b    *Bitlist
+		want bool
+	}{
+		{
+			a:    NewBitlistFrom([]uint64{0x02}), // 0b00000010
+			b:    NewBitlistFrom([]uint64{0x03}), // 0b00000011
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x03}), // 0b00000011
+			b:    NewBitlistFrom([]uint64{0x03}), // 0b00000011
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x13}), // 0b00010011
+			b:    NewBitlistFrom([]uint64{0x15}), // 0b00010101
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x1F}), // 0b00011111
+			b:    NewBitlistFrom([]uint64{0x13}), // 0b00010011
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x1F}), // 0b00011111
+			b:    NewBitlistFrom([]uint64{0x13}), // 0b00010011
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x1F, 0x03}), // 0b00011111, 0b00000011
+			b:    NewBitlistFrom([]uint64{0x13, 0x02}), // 0b00010011, 0b00000010
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x1F, 0x01}), // 0b00011111, 0b00000001
+			b:    NewBitlistFrom([]uint64{0x93, 0x01}), // 0b10010011, 0b00000001
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0xFF, 0x02}), // 0b11111111, 0x00000010
+			b:    NewBitlistFrom([]uint64{0x13, 0x03}), // 0b00010011, 0x00000011
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0xFF, 0x85}), // 0b11111111, 0x10000111
+			b:    NewBitlistFrom([]uint64{0x13, 0x8F}), // 0b00010011, 0x10001111
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0xFF, 0x8F}), // 0b11111111, 0x10001111
+			b:    NewBitlistFrom([]uint64{0x13, 0x83}), // 0b00010011, 0x10000011
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		if tt.a.Contains(tt.b) != tt.want {
+			t.Errorf(
+				"(%+v).Contains(%+v) = %t, wanted %t", tt.a, tt.b, tt.a.Contains(tt.b), tt.want,
+			)
+		}
+	}
+}

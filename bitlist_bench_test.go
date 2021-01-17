@@ -185,3 +185,44 @@ func BenchmarkBitlist_Bytes(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkBitlist_Contains(b *testing.B) {
+	for n := uint64(0); n <= 2048; n += 512 {
+		b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
+			b.Run("[]byte", func(b *testing.B) {
+				b.StopTimer()
+				s := NewByteBitlist(n)
+				s1 := NewByteBitlist(n) // subset
+				s2 := NewByteBitlist(n) // not a subset
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+					s1.SetBitAt(i, true)
+					s2.SetBitAt(i, true)
+				}
+				s2.SetBitAt(1, true)
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.Contains(s1)
+					s.Contains(s2)
+				}
+			})
+			b.Run("[]uint64", func(b *testing.B) {
+				b.StopTimer()
+				s := NewBitlist(n)
+				s1 := NewBitlist(n) // subset
+				s2 := NewBitlist(n) // not a subset
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+					s1.SetBitAt(i, true)
+					s2.SetBitAt(i, true)
+				}
+				s2.SetBitAt(1, true)
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.Contains(s1)
+					s.Contains(s2)
+				}
+			})
+		})
+	}
+}

@@ -112,6 +112,22 @@ func (b *Bitlist) Count() uint64 {
 	return uint64(c)
 }
 
+// Contains returns true if the bitlist contains all of the bits from the provided argument
+// bitlist i.e. if `b` is a superset of `c`.
+// This method will panic if bitlists are not the same length.
+func (b *Bitlist) Contains(c *Bitlist) bool {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	for idx, word := range b.data {
+		if word^(word|c.data[idx]) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 // numWordsRequired calculates how many words are required to hold bitlist of n bits.
 func numWordsRequired(n uint64) int {
 	return int((n + (wordSize - 1)) >> wordSizeLog2)
