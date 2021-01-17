@@ -670,9 +670,120 @@ func TestBitlist_Contains(t *testing.T) {
 
 	for _, tt := range tests {
 		if tt.a.Contains(tt.b) != tt.want {
-			t.Errorf(
-				"(%+v).Contains(%+v) = %t, wanted %t", tt.a, tt.b, tt.a.Contains(tt.b), tt.want,
-			)
+			t.Errorf("(%+v).Contains(%+v) = %t, wanted %t", tt.a, tt.b, tt.a.Contains(tt.b), tt.want)
 		}
+	}
+}
+
+func TestBitlist_Overlaps(t *testing.T) {
+	tests := []struct {
+		a    *Bitlist
+		b    *Bitlist
+		want bool
+	}{
+		{
+			a:    NewBitlistFrom([]uint64{0x06}), // 0b00000110
+			b:    NewBitlistFrom([]uint64{0x05}), // 0b00000101
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x06}), // 0b00000110
+			b:    NewBitlistFrom([]uint64{0x01}), // 0b00000001
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x32}), // 0b00110010
+			b:    NewBitlistFrom([]uint64{0x21}), // 0b00100001
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x32}), // 0b00110010
+			b:    NewBitlistFrom([]uint64{0x01}), // 0b00000001
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x41}), // 0b00100001
+			b:    NewBitlistFrom([]uint64{0x40}), // 0b00100000
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x41}), // 0b00100001
+			b:    NewBitlistFrom([]uint64{0x00}), // 0b00000000
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x1F}), // 0b00011111
+			b:    NewBitlistFrom([]uint64{0x11}), // 0b00010001
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0xFF, 0x85}), // 0b11111111, 0b10000111
+			b:    NewBitlistFrom([]uint64{0x13, 0x8F}), // 0b00010011, 0b10001111
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x40}), // 0b00000001, 0b01000000
+			b:    NewBitlistFrom([]uint64{0x00, 0x40}), // 0b00000010, 0b01000000
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x40}), // 0b00000001, 0b01000000
+			b:    NewBitlistFrom([]uint64{0x00, 0x00}), // 0b00000010, 0b00000000
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x40}), // 0b00000001, 0b01000000
+			b:    NewBitlistFrom([]uint64{0x00, 0x80}), // 0b00000010, 0b10000000
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x40}), // 0b00000001, 0b01000000
+			b:    NewBitlistFrom([]uint64{0x02, 0x80}), // 0b00000010, 0b10000000
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x40}), // 0b00000001, 0b01000000
+			b:    NewBitlistFrom([]uint64{0x03, 0x80}), // 0b00000011, 0b10000000
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x40}), // 0b00000001, 0b01000000
+			b:    NewBitlistFrom([]uint64{0x02, 0x50}), // 0b00000010, 0b01010000
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x40}), // 0b00000001, 0b01000000
+			b:    NewBitlistFrom([]uint64{0x02, 0x40}), // 0b00000010, 0b01000000
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x00}), // 0b00000001, 0b01000000
+			b:    NewBitlistFrom([]uint64{0x02, 0x00}), // 0b00000010, 0b01000000
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x80}), // 0b00000001, 0b10000000
+			b:    NewBitlistFrom([]uint64{0x03, 0x40}), // 0b00000011, 0b01000000
+			want: true,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x01, 0x02}), // 0b00000001, 0b00000001, 0b00000010
+			b:    NewBitlistFrom([]uint64{0x02, 0x00, 0x01}), // 0b00000010, 0b00000000, 0b00000001
+			want: false,
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x01, 0x01, 0x02}), // 0b00000001, 0b00000001, 0b00000010
+			b:    NewBitlistFrom([]uint64{0x02, 0x03, 0x01}), // 0b00000010, 0b00000000, 0b00000001
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("bitlist:%+v,%+v", tt.a, tt.b), func(t *testing.T) {
+			result := tt.a.Overlaps(tt.b)
+			if result != tt.want {
+				t.Errorf("(%+v).Overlaps(%+v) = %t, wanted %t", tt.a, tt.b, result, tt.want)
+			}
+		})
 	}
 }

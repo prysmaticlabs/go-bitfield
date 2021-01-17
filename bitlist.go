@@ -16,6 +16,8 @@ const (
 	bytesInWord = 8
 	// bytesInWordLog2 = log_2(8)
 	bytesInWordLog2 = 3
+	// allBitsSet is a word with all bits set.
+	allBitsSet = uint64(0xffffffffffffffff)
 )
 
 // Bitlist is a bitfield implementation backed by an array of uint64.
@@ -120,12 +122,38 @@ func (b *Bitlist) Contains(c *Bitlist) bool {
 		panic("bitlists are different lengths")
 	}
 
+	// To ensure all of the bits in c are present in b, we iterate over every word, combine
+	// the words from b and c, then XOR them against b. If the result of this is non-zero, then we
+	// are assured that a word in c had bits not present in word in b.
 	for idx, word := range b.data {
 		if word^(word|c.data[idx]) != 0 {
 			return false
 		}
 	}
 	return true
+}
+
+// Overlaps returns true if the bitlist contains one of the bits from the provided argument
+// bitlist. This method will panic if bitlists are not the same length.
+func (b *Bitlist) Overlaps(c *Bitlist) bool {
+	lenB, lenC := b.Len(), c.Len()
+	if lenB != lenC {
+		panic("bitlists are different lengths")
+	}
+
+	if lenB == 0 || lenC == 0 {
+		return false
+	}
+
+	// To ensure all of the bits in c are not overlapped in b, we iterate over every word, invert b
+	// and xor the word from b and c, then and it against c. If the result is non-zero, then
+	// we can be assured that word in c had bits not overlapped in b.
+	for idx, word := range b.data {
+		if (^word^c.data[idx])&c.data[idx]&allBitsSet != 0 {
+			return true
+		}
+	}
+	return false
 }
 
 // numWordsRequired calculates how many words are required to hold bitlist of n bits.
