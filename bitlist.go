@@ -14,6 +14,8 @@ const (
 	wordSizeLog2 = uint64(6)
 	// bytesInWord defines how many bytes are there in a single word i.e. wordSize/8.
 	bytesInWord = 8
+	// bytesInWordLog2 = log_2(8)
+	bytesInWordLog2 = 3
 )
 
 // Bitlist is a bitfield implementation backed by an array of uint64.
@@ -88,15 +90,17 @@ func (b *Bitlist) Bytes() []byte {
 	ret := buf.Bytes()
 
 	// Clear any leading zero bytes.
-	newLen := len(ret)
-	for i := len(ret) - 1; i >= 0; i-- {
-		if ret[i] != 0x00 {
+	allLeadingZeroes := 0
+	for i := len(b.data) - 1; i >= 0; i-- {
+		leadingZeroes := bits.LeadingZeros64(b.data[i])
+		allLeadingZeroes += leadingZeroes
+		// If the whole word is 0x0, allow to test the next word, break otherwise.
+		if uint64(leadingZeroes) != wordSize {
 			break
 		}
-		newLen = i
 	}
 
-	return ret[:newLen]
+	return ret[:len(ret)-allLeadingZeroes>>bytesInWordLog2]
 }
 
 // Count returns the number of 1s in the bitlist.
