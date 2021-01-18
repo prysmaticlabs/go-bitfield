@@ -156,7 +156,7 @@ func (b *Bitlist) Overlaps(c *Bitlist) bool {
 	return false
 }
 
-// Or returns the OR result of the two bitfields.
+// Or returns the OR result of the two bitfields (union).
 // This method will panic if the bitlists are not the same length.
 func (b *Bitlist) Or(c *Bitlist) *Bitlist {
 	if b.Len() != c.Len() {
@@ -169,8 +169,8 @@ func (b *Bitlist) Or(c *Bitlist) *Bitlist {
 	return ret
 }
 
-// NoAllocOr computes the OR result of the two bitfields. Result is written into provided variable,
-// so no allocation takes place insde the function.
+// NoAllocOr computes the OR result of the two bitfields (union).
+// Result is written into provided variable, so no allocation takes place inside the function.
 // This method will panic if the bitlists are not the same length.
 func (b *Bitlist) NoAllocOr(c, ret *Bitlist) {
 	if b.Len() != c.Len() {
@@ -179,6 +179,32 @@ func (b *Bitlist) NoAllocOr(c, ret *Bitlist) {
 
 	for idx, word := range b.data {
 		ret.data[idx] = word | c.data[idx]
+	}
+}
+
+// And returns the AND result of the two bitfields (intersection).
+// This method will panic if the bitlists are not the same length.
+func (b *Bitlist) And(c *Bitlist) *Bitlist {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	ret := b.Clone()
+	b.NoAllocAnd(c, ret)
+
+	return ret
+}
+
+// NoAllocAnd computes the AND result of the two bitfields (intersection).
+// Result is written into provided variable, so no allocation takes place inside the function.
+// This method will panic if the bitlists are not the same length.
+func (b *Bitlist) NoAllocAnd(c, ret *Bitlist) {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	for idx, word := range b.data {
+		ret.data[idx] = word & c.data[idx]
 	}
 }
 
