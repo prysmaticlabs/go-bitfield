@@ -28,7 +28,7 @@ func BenchmarkBitlist_New(b *testing.B) {
 }
 
 func BenchmarkBitlist_Len(b *testing.B) {
-	for n := uint64(0); n <= 2048; n += 1024 {
+	for n := uint64(0); n <= 2048; n += 512 {
 		b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
 			b.Run("[]byte", func(b *testing.B) {
 				b.StopTimer()
@@ -51,7 +51,7 @@ func BenchmarkBitlist_Len(b *testing.B) {
 }
 
 func BenchmarkBitlist_SetBitAt(b *testing.B) {
-	for n := uint64(0); n <= 2048; n += 1024 {
+	for n := uint64(0); n <= 2048; n += 512 {
 		idx := n / 2
 		b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
 			b.Run("[]byte", func(b *testing.B) {
