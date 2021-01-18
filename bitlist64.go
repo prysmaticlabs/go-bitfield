@@ -6,7 +6,7 @@ import (
 	"math/bits"
 )
 
-var _ = Bitfield(&Bitlist{})
+var _ = Bitfield(&Bitlist64{})
 
 const (
 	// wordSize configures how many bits are there in a single element of bitlist array.
@@ -22,23 +22,23 @@ const (
 	allBitsSet = uint64(0xffffffffffffffff)
 )
 
-// Bitlist is a bitfield implementation backed by an array of uint64.
-type Bitlist struct {
+// Bitlist64 is a bitfield implementation backed by an array of uint64.
+type Bitlist64 struct {
 	size uint64
 	data []uint64
 }
 
-// NewBitlist creates a new bitlist of size N.
-func NewBitlist(n uint64) *Bitlist {
-	return &Bitlist{
+// NewBitlist64 creates a new bitlist of size N.
+func NewBitlist64(n uint64) *Bitlist64 {
+	return &Bitlist64{
 		size: n,
 		data: make([]uint64, numWordsRequired(n)),
 	}
 }
 
-// NewBitlistFrom creates a new bitlist for a given uint64 array.
-func NewBitlistFrom(data []uint64) *Bitlist {
-	return &Bitlist{
+// NewBitlist64From creates a new bitlist for a given uint64 array.
+func NewBitlist64From(data []uint64) *Bitlist64 {
+	return &Bitlist64{
 		size: uint64(len(data)) * wordSize,
 		data: data,
 	}
@@ -46,7 +46,7 @@ func NewBitlistFrom(data []uint64) *Bitlist {
 
 // BitAt returns the bit value at the given index. If the index requested
 // exceeds the number of bits in the bitlist, then this method returns false.
-func (b *Bitlist) BitAt(idx uint64) bool {
+func (b *Bitlist64) BitAt(idx uint64) bool {
 	// Out of bounds, must be false.
 	if idx >= b.size {
 		return false
@@ -59,7 +59,7 @@ func (b *Bitlist) BitAt(idx uint64) bool {
 // SetBitAt will set the bit at the given index to the given value. If the index
 // requested exceeds the number of bits in the bitlist, then this method returns
 // false.
-func (b *Bitlist) SetBitAt(idx uint64, val bool) {
+func (b *Bitlist64) SetBitAt(idx uint64, val bool) {
 	// Out of bounds, do nothing.
 	if idx >= b.size {
 		return
@@ -74,7 +74,7 @@ func (b *Bitlist) SetBitAt(idx uint64, val bool) {
 }
 
 // Len returns the number of bits in a bitlist (note that underlying array can be bigger).
-func (b *Bitlist) Len() uint64 {
+func (b *Bitlist64) Len() uint64 {
 	return b.size
 }
 
@@ -82,7 +82,7 @@ func (b *Bitlist) Len() uint64 {
 // The leading zeros in the bitlist will be trimmed to the smallest byte length
 // representation of the bitlist. This may produce an empty byte slice if all
 // bits were zero.
-func (b *Bitlist) Bytes() []byte {
+func (b *Bitlist64) Bytes() []byte {
 	if len(b.data) == 0 {
 		return []byte{}
 	}
@@ -108,7 +108,7 @@ func (b *Bitlist) Bytes() []byte {
 }
 
 // Count returns the number of 1s in the bitlist.
-func (b *Bitlist) Count() uint64 {
+func (b *Bitlist64) Count() uint64 {
 	c := 0
 	for _, bt := range b.data {
 		c += bits.OnesCount64(bt)
@@ -119,7 +119,7 @@ func (b *Bitlist) Count() uint64 {
 // Contains returns true if the bitlist contains all of the bits from the provided argument
 // bitlist i.e. if `b` is a superset of `c`.
 // This method will panic if bitlists are not the same length.
-func (b *Bitlist) Contains(c *Bitlist) bool {
+func (b *Bitlist64) Contains(c *Bitlist64) bool {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -137,7 +137,7 @@ func (b *Bitlist) Contains(c *Bitlist) bool {
 
 // Overlaps returns true if the bitlist contains one of the bits from the provided argument
 // bitlist. This method will panic if bitlists are not the same length.
-func (b *Bitlist) Overlaps(c *Bitlist) bool {
+func (b *Bitlist64) Overlaps(c *Bitlist64) bool {
 	lenB, lenC := b.Len(), c.Len()
 	if lenB != lenC {
 		panic("bitlists are different lengths")
@@ -160,7 +160,7 @@ func (b *Bitlist) Overlaps(c *Bitlist) bool {
 
 // Or returns the OR result of the two bitfields (union).
 // This method will panic if the bitlists are not the same length.
-func (b *Bitlist) Or(c *Bitlist) *Bitlist {
+func (b *Bitlist64) Or(c *Bitlist64) *Bitlist64 {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -174,7 +174,7 @@ func (b *Bitlist) Or(c *Bitlist) *Bitlist {
 // NoAllocOr computes the OR result of the two bitfields (union).
 // Result is written into provided variable, so no allocation takes place inside the function.
 // This method will panic if the bitlists are not the same length.
-func (b *Bitlist) NoAllocOr(c, ret *Bitlist) {
+func (b *Bitlist64) NoAllocOr(c, ret *Bitlist64) {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -186,7 +186,7 @@ func (b *Bitlist) NoAllocOr(c, ret *Bitlist) {
 
 // And returns the AND result of the two bitfields (intersection).
 // This method will panic if the bitlists are not the same length.
-func (b *Bitlist) And(c *Bitlist) *Bitlist {
+func (b *Bitlist64) And(c *Bitlist64) *Bitlist64 {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -200,7 +200,7 @@ func (b *Bitlist) And(c *Bitlist) *Bitlist {
 // NoAllocAnd computes the AND result of the two bitfields (intersection).
 // Result is written into provided variable, so no allocation takes place inside the function.
 // This method will panic if the bitlists are not the same length.
-func (b *Bitlist) NoAllocAnd(c, ret *Bitlist) {
+func (b *Bitlist64) NoAllocAnd(c, ret *Bitlist64) {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -212,7 +212,7 @@ func (b *Bitlist) NoAllocAnd(c, ret *Bitlist) {
 
 // Xor returns the XOR result of the two bitfields (symmetric difference).
 // This method will panic if the bitlists are not the same length.
-func (b *Bitlist) Xor(c *Bitlist) *Bitlist {
+func (b *Bitlist64) Xor(c *Bitlist64) *Bitlist64 {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -226,7 +226,7 @@ func (b *Bitlist) Xor(c *Bitlist) *Bitlist {
 // NoAllocXor returns the XOR result of the two bitfields (symmetric difference).
 // Result is written into provided variable, so no allocation takes place inside the function.
 // This method will panic if the bitlists are not the same length.
-func (b *Bitlist) NoAllocXor(c, ret *Bitlist) {
+func (b *Bitlist64) NoAllocXor(c, ret *Bitlist64) {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -237,7 +237,7 @@ func (b *Bitlist) NoAllocXor(c, ret *Bitlist) {
 }
 
 // Not returns the NOT result of the bitfield (complement).
-func (b *Bitlist) Not() *Bitlist {
+func (b *Bitlist64) Not() *Bitlist64 {
 	if b.Len() == 0 {
 		return b
 	}
@@ -250,7 +250,7 @@ func (b *Bitlist) Not() *Bitlist {
 
 // NoAllocNot returns the NOT result of the bitfield (complement).
 // Result is written into provided variable, so no allocation takes place inside the function.
-func (b *Bitlist) NoAllocNot(ret *Bitlist) {
+func (b *Bitlist64) NoAllocNot(ret *Bitlist64) {
 	if b.Len() == 0 {
 		return
 	}
@@ -261,7 +261,7 @@ func (b *Bitlist) NoAllocNot(ret *Bitlist) {
 }
 
 // BitIndices returns list of bit indexes of bitlist where value is set to true.
-func (b *Bitlist) BitIndices() []int {
+func (b *Bitlist64) BitIndices() []int {
 	indices := make([]int, b.Count())
 	b.NoAllocBitIndices(indices)
 
@@ -274,10 +274,10 @@ func (b *Bitlist) BitIndices() []int {
 //
 // Expected usage pattern:
 //
-// b := NewBitlist(n)
+// b := NewBitlist64(n)
 // indices := make([]int, b.Count())
 // b.NoAllocBitIndices(indices)
-func (b *Bitlist) NoAllocBitIndices(ret []int) {
+func (b *Bitlist64) NoAllocBitIndices(ret []int) {
 	capacity := cap(ret)
 	k := 0
 	for idx, word := range b.data {
@@ -302,8 +302,8 @@ replaceWithFunc:
 }
 
 // Clone safely copies a given bitlist.
-func (b *Bitlist) Clone() *Bitlist {
-	c := NewBitlist(b.size)
+func (b *Bitlist64) Clone() *Bitlist64 {
+	c := NewBitlist64(b.size)
 	if b.data != nil {
 		copy(c.data, b.data)
 	}

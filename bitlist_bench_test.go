@@ -15,12 +15,12 @@ func BenchmarkBitlist_New(b *testing.B) {
 			})
 			b.Run("[]uint64 new", func(b *testing.B) {
 				for i := 0; i < b.N; i++ {
-					NewBitlist(n)
+					NewBitlist64(n)
 				}
 			})
 			b.Run("[]uint64 new+from", func(b *testing.B) {
 				for i := 0; i < b.N; i++ {
-					NewBitlistFrom(NewBitlist(n).data)
+					NewBitlist64From(NewBitlist64(n).data)
 				}
 			})
 		})
@@ -40,7 +40,7 @@ func BenchmarkBitlist_Len(b *testing.B) {
 			})
 			b.Run("[]uint64", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
+				s := NewBitlist64(n)
 				b.StartTimer()
 				for i := 0; i < b.N; i++ {
 					s.Len()
@@ -66,7 +66,7 @@ func BenchmarkBitlist_SetBitAt(b *testing.B) {
 			})
 			b.Run("[]uint64", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
+				s := NewBitlist64(n)
 				b.StartTimer()
 				for i := 0; i < b.N; i++ {
 					s.BitAt(idx)
@@ -94,7 +94,7 @@ func BenchmarkBitlist_Count(b *testing.B) {
 			})
 			b.Run("[]uint64", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
+				s := NewBitlist64(n)
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 				}
@@ -124,7 +124,7 @@ func BenchmarkBitlist_Bytes(b *testing.B) {
 				})
 				b.Run("[]uint64", func(b *testing.B) {
 					b.StopTimer()
-					s := NewBitlist(n)
+					s := NewBitlist64(n)
 					for i := uint64(0); i < n; i += 10 {
 						s.SetBitAt(i, true)
 					}
@@ -150,7 +150,7 @@ func BenchmarkBitlist_Bytes(b *testing.B) {
 				})
 				b.Run("[]uint64", func(b *testing.B) {
 					b.StopTimer()
-					s := NewBitlist(n)
+					s := NewBitlist64(n)
 					for i := uint64(0); i < n/2; i += 10 {
 						s.SetBitAt(i, true)
 					}
@@ -174,7 +174,7 @@ func BenchmarkBitlist_Bytes(b *testing.B) {
 				})
 				b.Run("[]uint64", func(b *testing.B) {
 					b.StopTimer()
-					s := NewBitlist(n)
+					s := NewBitlist64(n)
 					s.SetBitAt(n, true)
 					b.StartTimer()
 					for i := 0; i < b.N; i++ {
@@ -208,9 +208,9 @@ func BenchmarkBitlist_Contains(b *testing.B) {
 			})
 			b.Run("[]uint64", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
-				s1 := NewBitlist(n) // subset
-				s2 := NewBitlist(n) // not a subset
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // subset
+				s2 := NewBitlist64(n) // not a subset
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 					s1.SetBitAt(i, true)
@@ -248,9 +248,9 @@ func BenchmarkBitlist_Overlaps(b *testing.B) {
 			})
 			b.Run("[]uint64", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
-				s1 := NewBitlist(n) // has overlaps
-				s2 := NewBitlist(n) // no overlaps
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // has overlaps
+				s2 := NewBitlist64(n) // no overlaps
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 					s1.SetBitAt(i, true)
@@ -287,9 +287,9 @@ func BenchmarkBitlist_Or(b *testing.B) {
 			})
 			b.Run("[]uint64", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
-				s1 := NewBitlist(n) // has overlaps
-				s2 := NewBitlist(n) // no overlaps
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // has overlaps
+				s2 := NewBitlist64(n) // no overlaps
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 					s1.SetBitAt(i, true)
@@ -303,9 +303,9 @@ func BenchmarkBitlist_Or(b *testing.B) {
 			})
 			b.Run("[]uint64 (noalloc)", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
-				s1 := NewBitlist(n) // has overlaps
-				s2 := NewBitlist(n) // no overlaps
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // has overlaps
+				s2 := NewBitlist64(n) // no overlaps
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 					s1.SetBitAt(i, true)
@@ -343,9 +343,9 @@ func BenchmarkBitlist_And(b *testing.B) {
 			})
 			b.Run("[]uint64", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
-				s1 := NewBitlist(n) // has overlaps
-				s2 := NewBitlist(n) // no overlaps
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // has overlaps
+				s2 := NewBitlist64(n) // no overlaps
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 					s1.SetBitAt(i, true)
@@ -359,9 +359,9 @@ func BenchmarkBitlist_And(b *testing.B) {
 			})
 			b.Run("[]uint64 (noalloc)", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
-				s1 := NewBitlist(n) // has overlaps
-				s2 := NewBitlist(n) // no overlaps
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // has overlaps
+				s2 := NewBitlist64(n) // no overlaps
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 					s1.SetBitAt(i, true)
@@ -399,9 +399,9 @@ func BenchmarkBitlist_Xor(b *testing.B) {
 			})
 			b.Run("[]uint64", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
-				s1 := NewBitlist(n) // has overlaps
-				s2 := NewBitlist(n) // no overlaps
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // has overlaps
+				s2 := NewBitlist64(n) // no overlaps
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 					s1.SetBitAt(i, true)
@@ -415,9 +415,9 @@ func BenchmarkBitlist_Xor(b *testing.B) {
 			})
 			b.Run("[]uint64 (noalloc)", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
-				s1 := NewBitlist(n) // has overlaps
-				s2 := NewBitlist(n) // no overlaps
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // has overlaps
+				s2 := NewBitlist64(n) // no overlaps
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 					s1.SetBitAt(i, true)
@@ -450,7 +450,7 @@ func BenchmarkBitlist_Not(b *testing.B) {
 			})
 			b.Run("[]uint64", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
+				s := NewBitlist64(n)
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 				}
@@ -461,7 +461,7 @@ func BenchmarkBitlist_Not(b *testing.B) {
 			})
 			b.Run("[]uint64 (noalloc)", func(b *testing.B) {
 				b.StopTimer()
-				s := NewBitlist(n)
+				s := NewBitlist64(n)
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 				}
@@ -492,7 +492,7 @@ func BenchmarkBitlist_BitIndices(b *testing.B) {
 				})
 				b.Run("[]uint64", func(b *testing.B) {
 					b.StopTimer()
-					s := NewBitlist(n)
+					s := NewBitlist64(n)
 					for i := uint64(0); i < n; i += 10 {
 						s.SetBitAt(i, true)
 					}
@@ -503,7 +503,7 @@ func BenchmarkBitlist_BitIndices(b *testing.B) {
 				})
 				b.Run("[]uint64 (noalloc)", func(b *testing.B) {
 					b.StopTimer()
-					s := NewBitlist(n)
+					s := NewBitlist64(n)
 					for i := uint64(0); i < n; i += 10 {
 						s.SetBitAt(i, true)
 					}
@@ -530,7 +530,7 @@ func BenchmarkBitlist_BitIndices(b *testing.B) {
 				})
 				b.Run("[]uint64", func(b *testing.B) {
 					b.StopTimer()
-					s := NewBitlist(n)
+					s := NewBitlist64(n)
 					for i := uint64(0); i < n/2; i += 10 {
 						s.SetBitAt(i, true)
 					}
@@ -541,7 +541,7 @@ func BenchmarkBitlist_BitIndices(b *testing.B) {
 				})
 				b.Run("[]uint64 (noalloc)", func(b *testing.B) {
 					b.StopTimer()
-					s := NewBitlist(n)
+					s := NewBitlist64(n)
 					for i := uint64(0); i < n/2; i += 10 {
 						s.SetBitAt(i, true)
 					}
@@ -566,7 +566,7 @@ func BenchmarkBitlist_BitIndices(b *testing.B) {
 				})
 				b.Run("[]uint64", func(b *testing.B) {
 					b.StopTimer()
-					s := NewBitlist(n)
+					s := NewBitlist64(n)
 					s.SetBitAt(n, true)
 					b.StartTimer()
 					for i := 0; i < b.N; i++ {
@@ -575,7 +575,7 @@ func BenchmarkBitlist_BitIndices(b *testing.B) {
 				})
 				b.Run("[]uint64 (noalloc)", func(b *testing.B) {
 					b.StopTimer()
-					s := NewBitlist(n)
+					s := NewBitlist64(n)
 					s.SetBitAt(n, true)
 					indices := make([]int, s.Count())
 					b.StartTimer()
