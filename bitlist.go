@@ -4,9 +4,9 @@ import (
 	"math/bits"
 )
 
-var _ = Bitfield(ByteBitlist{})
+var _ = Bitfield(Bitlist{})
 
-// ByteBitlist is a bitfield implementation backed by an array of bytes. The most
+// Bitlist is a bitfield implementation backed by an array of bytes. The most
 // significant bit in the array of bytes indicates the start position of the
 // bitfield.
 //
@@ -15,14 +15,11 @@ var _ = Bitfield(ByteBitlist{})
 //  byte{0b00011111} is a bitlist with 4 bits which are all one.  bits=[1,1,1,1]
 //  byte{0b00011000, 0b00000001} is a bitlist with 8 bits.        bits=[0,0,0,1,1,0,0,0]
 //  byte{0b00011000, 0b00000010} is a bitlist with 9 bits.        bits=[0,0,0,0,1,1,0,0,0]
-//
-// Note: This is the original implementation of bitfield, which is superseded by a more
-// optimized version which is based on array of uint64 (see Bitlist for details).
-type ByteBitlist []byte
+type Bitlist []byte
 
-// NewByteBitlist creates a new bitlist of size N.
-func NewByteBitlist(n uint64) ByteBitlist {
-	ret := make(ByteBitlist, n/8+1)
+// NewBitlist creates a new bitlist of size N.
+func NewBitlist(n uint64) Bitlist {
+	ret := make(Bitlist, n/8+1)
 
 	// Set most significant bit for length bit.
 	i := uint8(1 << (n % 8))
@@ -33,7 +30,7 @@ func NewByteBitlist(n uint64) ByteBitlist {
 
 // BitAt returns the bit value at the given index. If the index requested
 // exceeds the number of bits in the bitlist, then this method returns false.
-func (b ByteBitlist) BitAt(idx uint64) bool {
+func (b Bitlist) BitAt(idx uint64) bool {
 	// Out of bounds, must be false.
 	upperBounds := b.Len()
 	if idx >= upperBounds {
@@ -47,7 +44,7 @@ func (b ByteBitlist) BitAt(idx uint64) bool {
 // SetBitAt will set the bit at the given index to the given value. If the index
 // requested exceeds the number of bits in the bitlist, then this method returns
 // false.
-func (b ByteBitlist) SetBitAt(idx uint64, val bool) {
+func (b Bitlist) SetBitAt(idx uint64, val bool) {
 	// Out of bounds, do nothing.
 	upperBounds := b.Len()
 	if idx >= upperBounds {
@@ -65,7 +62,7 @@ func (b ByteBitlist) SetBitAt(idx uint64, val bool) {
 
 // Len of the bitlist returns the number of bits available in the underlying
 // byte array.
-func (b ByteBitlist) Len() uint64 {
+func (b Bitlist) Len() uint64 {
 	if len(b) == 0 {
 		return 0
 	}
@@ -88,7 +85,7 @@ func (b ByteBitlist) Len() uint64 {
 // leading zeros in the bitlist will be trimmed to the smallest byte length
 // representation of the bitlist. This may produce an empty byte slice if all
 // bits were zero.
-func (b ByteBitlist) Bytes() []byte {
+func (b Bitlist) Bytes() []byte {
 	if len(b) == 0 {
 		return []byte{}
 	}
@@ -114,7 +111,7 @@ func (b ByteBitlist) Bytes() []byte {
 }
 
 // Count returns the number of 1s in the bitlist.
-func (b ByteBitlist) Count() uint64 {
+func (b Bitlist) Count() uint64 {
 	c := 0
 
 	for _, bt := range b {
@@ -130,7 +127,7 @@ func (b ByteBitlist) Count() uint64 {
 
 // Contains returns true if the bitlist contains all of the bits from the provided argument
 // bitlist. This method will panic if bitlists are not the same length.
-func (b ByteBitlist) Contains(c ByteBitlist) bool {
+func (b Bitlist) Contains(c Bitlist) bool {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -149,7 +146,7 @@ func (b ByteBitlist) Contains(c ByteBitlist) bool {
 
 // Overlaps returns true if the bitlist contains one of the bits from the provided argument
 // bitlist. This method will panic if bitlists are not the same length.
-func (b ByteBitlist) Overlaps(c ByteBitlist) bool {
+func (b Bitlist) Overlaps(c Bitlist) bool {
 	lenB, lenC := b.Len(), c.Len()
 	if lenB != lenC {
 		panic("bitlists are different lengths")
@@ -180,7 +177,7 @@ func (b ByteBitlist) Overlaps(c ByteBitlist) bool {
 }
 
 // Or returns the OR result of the two bitfields. This method will panic if the bitlists are not the same length.
-func (b ByteBitlist) Or(c ByteBitlist) ByteBitlist {
+func (b Bitlist) Or(c Bitlist) Bitlist {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -194,7 +191,7 @@ func (b ByteBitlist) Or(c ByteBitlist) ByteBitlist {
 }
 
 // And returns the AND result of the two bitfields. This method will panic if the bitlists are not the same length.
-func (b ByteBitlist) And(c ByteBitlist) ByteBitlist {
+func (b Bitlist) And(c Bitlist) Bitlist {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -208,7 +205,7 @@ func (b ByteBitlist) And(c ByteBitlist) ByteBitlist {
 }
 
 // Xor returns the XOR result of the two bitfields. This method will panic if the bitlists are not the same length.
-func (b ByteBitlist) Xor(c ByteBitlist) ByteBitlist {
+func (b Bitlist) Xor(c Bitlist) Bitlist {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
@@ -232,7 +229,7 @@ func (b ByteBitlist) Xor(c ByteBitlist) ByteBitlist {
 }
 
 // Not returns the NOT result of the bitfield.
-func (b ByteBitlist) Not() ByteBitlist {
+func (b Bitlist) Not() Bitlist {
 	if b.Len() == 0 {
 		return b
 	}
@@ -255,7 +252,7 @@ func (b ByteBitlist) Not() ByteBitlist {
 	return ret
 }
 
-func (b ByteBitlist) BitIndices() []int {
+func (b Bitlist) BitIndices() []int {
 	indices := make([]int, 0, b.Count())
 	for i, bt := range b {
 		if i == len(b)-1 {
