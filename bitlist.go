@@ -208,6 +208,32 @@ func (b *Bitlist) NoAllocAnd(c, ret *Bitlist) {
 	}
 }
 
+// Xor returns the XOR result of the two bitfields (symmetric difference).
+// This method will panic if the bitlists are not the same length.
+func (b *Bitlist) Xor(c *Bitlist) *Bitlist {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	ret := b.Clone()
+	b.NoAllocXor(c, ret)
+
+	return ret
+}
+
+// NoAllocXor returns the XOR result of the two bitfields (symmetric difference).
+// Result is written into provided variable, so no allocation takes place inside the function.
+// This method will panic if the bitlists are not the same length.
+func (b *Bitlist) NoAllocXor(c, ret *Bitlist) {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	for idx, word := range b.data {
+		ret.data[idx] = word ^ c.data[idx]
+	}
+}
+
 // Clone safely copies a given bitlist.
 func (b *Bitlist) Clone() *Bitlist {
 	c := NewBitlist(b.size)
