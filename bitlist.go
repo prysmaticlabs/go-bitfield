@@ -156,6 +156,41 @@ func (b *Bitlist) Overlaps(c *Bitlist) bool {
 	return false
 }
 
+// Or returns the OR result of the two bitfields.
+// This method will panic if the bitlists are not the same length.
+func (b *Bitlist) Or(c *Bitlist) *Bitlist {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	ret := b.Clone()
+	b.NoAllocOr(c, ret)
+
+	return ret
+}
+
+// NoAllocOr computes the OR result of the two bitfields. Result is written into provided variable,
+// so no allocation takes place insde the function.
+// This method will panic if the bitlists are not the same length.
+func (b *Bitlist) NoAllocOr(c, ret *Bitlist) {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	for idx, word := range b.data {
+		ret.data[idx] = word | c.data[idx]
+	}
+}
+
+// Clone safely copies a given bitlist.
+func (b *Bitlist) Clone() *Bitlist {
+	c := NewBitlist(b.size)
+	if b.data != nil {
+		copy(c.data, b.data)
+	}
+	return c
+}
+
 // numWordsRequired calculates how many words are required to hold bitlist of n bits.
 func numWordsRequired(n uint64) int {
 	return int((n + (wordSize - 1)) >> wordSizeLog2)

@@ -234,7 +234,7 @@ func BenchmarkBitlist_Overlaps(b *testing.B) {
 				b.StopTimer()
 				s := NewByteBitlist(n)
 				s1 := NewByteBitlist(n) // has overlaps
-				s2 := NewByteBitlist(n) // not overlaps
+				s2 := NewByteBitlist(n) // no overlaps
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 					s1.SetBitAt(i, true)
@@ -250,7 +250,7 @@ func BenchmarkBitlist_Overlaps(b *testing.B) {
 				b.StopTimer()
 				s := NewBitlist(n)
 				s1 := NewBitlist(n) // has overlaps
-				s2 := NewBitlist(n) // not overlaps
+				s2 := NewBitlist(n) // no overlaps
 				for i := uint64(0); i < n; i += 100 {
 					s.SetBitAt(i, true)
 					s1.SetBitAt(i, true)
@@ -260,6 +260,62 @@ func BenchmarkBitlist_Overlaps(b *testing.B) {
 				for i := 0; i < b.N; i++ {
 					s.Overlaps(s1)
 					s.Overlaps(s2)
+				}
+			})
+		})
+	}
+}
+
+func BenchmarkBitlist_Or(b *testing.B) {
+	for n := uint64(0); n <= 2048; n += 256 {
+		b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
+			b.Run("[]byte", func(b *testing.B) {
+				b.StopTimer()
+				s := NewByteBitlist(n)
+				s1 := NewByteBitlist(n) // has overlaps
+				s2 := NewByteBitlist(n) // no overlaps
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+					s1.SetBitAt(i, true)
+					s2.SetBitAt(i+1, true)
+				}
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.Or(s1)
+					s.Or(s2)
+				}
+			})
+			b.Run("[]uint64", func(b *testing.B) {
+				b.StopTimer()
+				s := NewBitlist(n)
+				s1 := NewBitlist(n) // has overlaps
+				s2 := NewBitlist(n) // no overlaps
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+					s1.SetBitAt(i, true)
+					s2.SetBitAt(i+1, true)
+				}
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.Or(s1)
+					s.Or(s2)
+				}
+			})
+			b.Run("[]uint64 (noalloc)", func(b *testing.B) {
+				b.StopTimer()
+				s := NewBitlist(n)
+				s1 := NewBitlist(n) // has overlaps
+				s2 := NewBitlist(n) // no overlaps
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+					s1.SetBitAt(i, true)
+					s2.SetBitAt(i+1, true)
+				}
+				result := s.Clone()
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.NoAllocOr(s1, result)
+					s.NoAllocOr(s2, result)
 				}
 			})
 		})

@@ -787,3 +787,74 @@ func TestBitlist_Overlaps(t *testing.T) {
 		})
 	}
 }
+
+func TestBitlist_Or(t *testing.T) {
+	tests := []struct {
+		a    *Bitlist
+		b    *Bitlist
+		want *Bitlist
+	}{
+		{
+			a:    NewBitlistFrom([]uint64{0x02}), // 0b00000010
+			b:    NewBitlistFrom([]uint64{0x03}), // 0b00000011
+			want: NewBitlistFrom([]uint64{0x03}), // 0b00000011
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x03}), // 0b00000011
+			b:    NewBitlistFrom([]uint64{0x03}), // 0b00000011
+			want: NewBitlistFrom([]uint64{0x03}), // 0b00000011
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x13}), // 0b00010011
+			b:    NewBitlistFrom([]uint64{0x15}), // 0b00010101
+			want: NewBitlistFrom([]uint64{0x17}), // 0b00010111
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x1F}), // 0b00011111
+			b:    NewBitlistFrom([]uint64{0x13}), // 0b00010011
+			want: NewBitlistFrom([]uint64{0x1F}), // 0b00011111
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x1F, 0x03}), // 0b00011111, 0b00000011
+			b:    NewBitlistFrom([]uint64{0x13, 0x02}), // 0b00010011, 0b00000010
+			want: NewBitlistFrom([]uint64{0x1F, 0x03}), // 0b00011111, 0b00000011
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x1F, 0x01}), // 0b00011111, 0b00000001
+			b:    NewBitlistFrom([]uint64{0x93, 0x01}), // 0b10010011, 0b00000001
+			want: NewBitlistFrom([]uint64{0x9F, 0x01}), // 0b00011111, 0b00000001
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0xFF, 0x02}), // 0b11111111, 0x00000010
+			b:    NewBitlistFrom([]uint64{0x13, 0x03}), // 0b00010011, 0x00000011
+			want: NewBitlistFrom([]uint64{0xFF, 0x03}), // 0b11111111, 0x00000011
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0xFF, 0x85}), // 0b11111111, 0x10000111
+			b:    NewBitlistFrom([]uint64{0x13, 0x8F}), // 0b00010011, 0x10001111
+			want: NewBitlistFrom([]uint64{0xFF, 0x8F}), // 0b11111111, 0x10001111
+		},
+	}
+
+	t.Run("Or()", func(t *testing.T) {
+		for _, tt := range tests {
+			if !reflect.DeepEqual(tt.a.Or(tt.b).data, tt.want.data) {
+				t.Errorf("(%+v).Or(%+v) = %+v, wanted %x", tt.a, tt.b, tt.a.Or(tt.b), tt.want)
+			}
+		}
+	})
+	t.Run("NoAllocOr()", func(t *testing.T) {
+		for _, tt := range tests {
+			res := tt.a.Clone()
+			// Make sure that no existing bits set interfere with operation. This is done to simulate
+			// the case when res variable is already populated from the previous run.
+			for i := uint64(0); i < res.Len(); i += 10 {
+				res.SetBitAt(i, true)
+			}
+			tt.a.NoAllocOr(tt.b, res)
+			if !reflect.DeepEqual(res.data, tt.want.data) {
+				t.Errorf("(%+v).Or(%+v) = %+v, wanted %x", tt.a, tt.b, res.data, tt.want)
+			}
+		}
+	})
+}
