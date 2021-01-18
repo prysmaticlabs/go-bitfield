@@ -474,3 +474,116 @@ func BenchmarkBitlist_Not(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkBitlist_BitIndices(b *testing.B) {
+	for n := uint64(0); n <= 2048; n += 512 {
+		b.Run("bitlist non empty", func(b *testing.B) {
+			b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
+				b.Run("[]byte", func(b *testing.B) {
+					b.StopTimer()
+					s := NewByteBitlist(n)
+					for i := uint64(0); i < n; i += 10 {
+						s.SetBitAt(i, true)
+					}
+					b.StartTimer()
+					for i := 0; i < b.N; i++ {
+						s.BitIndices()
+					}
+				})
+				b.Run("[]uint64", func(b *testing.B) {
+					b.StopTimer()
+					s := NewBitlist(n)
+					for i := uint64(0); i < n; i += 10 {
+						s.SetBitAt(i, true)
+					}
+					b.StartTimer()
+					for i := 0; i < b.N; i++ {
+						s.BitIndices()
+					}
+				})
+				b.Run("[]uint64 (noalloc)", func(b *testing.B) {
+					b.StopTimer()
+					s := NewBitlist(n)
+					for i := uint64(0); i < n; i += 10 {
+						s.SetBitAt(i, true)
+					}
+					indices := make([]int, s.Count())
+					b.StartTimer()
+					for i := 0; i < b.N; i++ {
+						s.NoAllocBitIndices(indices)
+					}
+				})
+			})
+		})
+		b.Run("up to half bitlist non empty", func(b *testing.B) {
+			b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
+				b.Run("[]byte", func(b *testing.B) {
+					b.StopTimer()
+					s := NewByteBitlist(n)
+					for i := uint64(0); i < n/2; i += 10 {
+						s.SetBitAt(i, true)
+					}
+					b.StartTimer()
+					for i := 0; i < b.N; i++ {
+						s.BitIndices()
+					}
+				})
+				b.Run("[]uint64", func(b *testing.B) {
+					b.StopTimer()
+					s := NewBitlist(n)
+					for i := uint64(0); i < n/2; i += 10 {
+						s.SetBitAt(i, true)
+					}
+					b.StartTimer()
+					for i := 0; i < b.N; i++ {
+						s.BitIndices()
+					}
+				})
+				b.Run("[]uint64 (noalloc)", func(b *testing.B) {
+					b.StopTimer()
+					s := NewBitlist(n)
+					for i := uint64(0); i < n/2; i += 10 {
+						s.SetBitAt(i, true)
+					}
+					indices := make([]int, s.Count())
+					b.StartTimer()
+					for i := 0; i < b.N; i++ {
+						s.NoAllocBitIndices(indices)
+					}
+				})
+			})
+		})
+		b.Run("only single bit set", func(b *testing.B) {
+			b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
+				b.Run("[]byte", func(b *testing.B) {
+					b.StopTimer()
+					s := NewByteBitlist(n)
+					s.SetBitAt(n, true)
+					b.StartTimer()
+					for i := 0; i < b.N; i++ {
+						s.BitIndices()
+					}
+				})
+				b.Run("[]uint64", func(b *testing.B) {
+					b.StopTimer()
+					s := NewBitlist(n)
+					s.SetBitAt(n, true)
+					b.StartTimer()
+					for i := 0; i < b.N; i++ {
+						s.BitIndices()
+					}
+				})
+				b.Run("[]uint64 (noalloc)", func(b *testing.B) {
+					b.StopTimer()
+					s := NewBitlist(n)
+					s.SetBitAt(n, true)
+					indices := make([]int, s.Count())
+					b.StartTimer()
+					for i := 0; i < b.N; i++ {
+						s.NoAllocBitIndices(indices)
+					}
+				})
+			})
+		})
+	}
+}

@@ -1087,3 +1087,51 @@ func TestBitlist_Not(t *testing.T) {
 		}
 	})
 }
+
+func TestBitlist_BitIndices(t *testing.T) {
+	tests := []struct {
+		a    *Bitlist
+		want []int
+	}{
+		{
+			a:    NewBitlistFrom([]uint64{}),
+			want: []int{},
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0b10010}),
+			want: []int{1, 4},
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0b10000}),
+			want: []int{4},
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0b10, 0b1}),
+			want: []int{1, int(wordSize)},
+		},
+		{
+			a: NewBitlistFrom([]uint64{0x10, 0x01, 0xF0, 0xE0}),
+			want: []int{
+				4,
+				int(wordSize),
+				int(wordSize)*2 + 4, int(wordSize)*2 + 5, int(wordSize)*2 + 6, int(wordSize)*2 + 7,
+				int(wordSize)*3 + 5, int(wordSize)*3 + 6, int(wordSize)*3 + 7,
+			},
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0b11111111, 0b0}),
+			want: []int{0, 1, 2, 3, 4, 5, 6, 7},
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0b11111111, 0b1}),
+			want: []int{0, 1, 2, 3, 4, 5, 6, 7, int(wordSize)},
+		},
+	}
+
+	for _, tt := range tests {
+		got := tt.a.BitIndices()
+		if !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("(%0.8b).BitIndices() = %v, wanted %v", tt.a, got, tt.want)
+		}
+	}
+}

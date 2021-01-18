@@ -6,6 +6,8 @@ import (
 	"math/bits"
 )
 
+var _ = Bitfield(&Bitlist{})
+
 const (
 	// wordSize configures how many bits are there in a single element of bitlist array.
 	wordSize = uint64(64)
@@ -256,6 +258,47 @@ func (b *Bitlist) NoAllocNot(ret *Bitlist) {
 	for idx, word := range b.data {
 		ret.data[idx] = ^word
 	}
+}
+
+// BitIndices returns list of bit indexes of bitlist where value is set to true.
+func (b *Bitlist) BitIndices() []int {
+	indices := make([]int, b.Count())
+	b.NoAllocBitIndices(indices)
+
+	return indices
+}
+
+// NoAllocBitIndices returns list of bit indexes of bitlist where value is set to true.
+// No allocation happens inside the function, so number of returned indexes is capped by the capacity
+// of the ret param.
+//
+// Expected usage pattern:
+//
+// b := NewBitlist(n)
+// indices := make([]int, b.Count())
+// b.NoAllocBitIndices(indices)
+func (b *Bitlist) NoAllocBitIndices(ret []int) {
+	capacity := cap(ret)
+	k := 0
+	for idx, word := range b.data {
+		for word != 0 {
+			// Push index of the first non-zero bit.
+			ret[k] = (idx << wordSizeLog2) + bits.TrailingZeros64(word)
+			k++
+			if k == capacity {
+				goto replaceWithFunc
+			}
+			// Clear less significant (rightmost) non-zero bit, and iterate.
+			// Consider the following bitlist, b := 0001.1001.0011.0000
+			// The `(^word) + 1` clears all bits till the word's non-zero bit i.e. `(^word)` == 1110.0110.1100.1111,
+			// then `(^word) + 1` == 1110.0110.1101.0000.
+			// The `word & ((^word) + 1)` clears all bits, except the one that was set to 1 in the original word i.e.
+			// `word & ((^word) + 1)` == 0000.0000.0001.0000.
+			// Now, XOR this with the original word to remove the rightmost bit.
+			word = word ^ (word & ((^word) + 1))
+		}
+	}
+replaceWithFunc:
 }
 
 // Clone safely copies a given bitlist.
