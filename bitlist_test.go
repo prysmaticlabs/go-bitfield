@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestNewByteBitlist(t *testing.T) {
+func TestNewBitlist(t *testing.T) {
 	tests := []struct {
 		size uint64
 		want Bitlist
@@ -51,7 +51,7 @@ func TestNewByteBitlist(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_Len(t *testing.T) {
+func TestBitlist_Len(t *testing.T) {
 	tests := []struct {
 		bitlist Bitlist
 		want    uint64
@@ -109,7 +109,7 @@ func TestByteBitlist_Len(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_BitAt(t *testing.T) {
+func TestBitlist_BitAt(t *testing.T) {
 	tests := []struct {
 		bitlist Bitlist
 		idx     uint64
@@ -185,7 +185,7 @@ func TestByteBitlist_BitAt(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_SetBitAt(t *testing.T) {
+func TestBitlist_SetBitAt(t *testing.T) {
 	tests := []struct {
 		bitlist Bitlist
 		idx     uint64
@@ -296,7 +296,7 @@ func TestByteBitlist_SetBitAt(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_Bytes(t *testing.T) {
+func TestBitlist_Bytes(t *testing.T) {
 	tests := []struct {
 		bitlist Bitlist
 		want    []byte
@@ -363,7 +363,7 @@ func TestByteBitlist_Bytes(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_Count(t *testing.T) {
+func TestBitlist_Count(t *testing.T) {
 	tests := []struct {
 		bitlist Bitlist
 		want    uint64
@@ -410,7 +410,7 @@ func TestByteBitlist_Count(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_Contains(t *testing.T) {
+func TestBitlist_Contains(t *testing.T) {
 	tests := []struct {
 		a    Bitlist
 		b    Bitlist
@@ -481,7 +481,7 @@ func TestByteBitlist_Contains(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_Overlaps(t *testing.T) {
+func TestBitlist_Overlaps(t *testing.T) {
 	tests := []struct {
 		a    Bitlist
 		b    Bitlist
@@ -553,7 +553,7 @@ func TestByteBitlist_Overlaps(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_Or(t *testing.T) {
+func TestBitlist_Or(t *testing.T) {
 	tests := []struct {
 		a    Bitlist
 		b    Bitlist
@@ -614,7 +614,7 @@ func TestByteBitlist_Or(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_And(t *testing.T) {
+func TestBitlist_And(t *testing.T) {
 	tests := []struct {
 		a    Bitlist
 		b    Bitlist
@@ -675,7 +675,7 @@ func TestByteBitlist_And(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_Xor(t *testing.T) {
+func TestBitlist_Xor(t *testing.T) {
 	tests := []struct {
 		a    Bitlist
 		b    Bitlist
@@ -738,7 +738,7 @@ func TestByteBitlist_Xor(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_Not(t *testing.T) {
+func TestBitlist_Not(t *testing.T) {
 	tests := []struct {
 		a    Bitlist
 		want Bitlist
@@ -811,7 +811,7 @@ func TestByteBitlist_Not(t *testing.T) {
 	}
 }
 
-func TestByteBitlist_BitIndices(t *testing.T) {
+func TestBitlist_BitIndices(t *testing.T) {
 	tests := []struct {
 		a    Bitlist
 		want []int
