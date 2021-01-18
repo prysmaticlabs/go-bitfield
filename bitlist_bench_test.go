@@ -433,3 +433,44 @@ func BenchmarkBitlist_Xor(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkBitlist_Not(b *testing.B) {
+	for n := uint64(0); n <= 2048; n += 256 {
+		b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
+			b.Run("[]byte", func(b *testing.B) {
+				b.StopTimer()
+				s := NewByteBitlist(n)
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+				}
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.Not()
+				}
+			})
+			b.Run("[]uint64", func(b *testing.B) {
+				b.StopTimer()
+				s := NewBitlist(n)
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+				}
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.Not()
+				}
+			})
+			b.Run("[]uint64 (noalloc)", func(b *testing.B) {
+				b.StopTimer()
+				s := NewBitlist(n)
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+				}
+				result := s.Clone()
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.NoAllocNot(result)
+				}
+			})
+		})
+	}
+}

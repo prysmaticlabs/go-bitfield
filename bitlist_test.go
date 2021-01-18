@@ -1005,3 +1005,85 @@ func TestBitlist_Xor(t *testing.T) {
 		}
 	})
 }
+
+func TestBitlist_Not(t *testing.T) {
+	tests := []struct {
+		a    *Bitlist
+		want *Bitlist
+	}{
+		{
+			a:    NewBitlistFrom([]uint64{0x01}),               // 0b00000001
+			want: NewBitlistFrom([]uint64{0xFFFFFFFFFFFFFFFE}), // 0b11111110
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x02}),               // 0b00000010
+			want: NewBitlistFrom([]uint64{0xFFFFFFFFFFFFFFFD}), // 0b11111101
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x03}),               // 0b00000011
+			want: NewBitlistFrom([]uint64{0xFFFFFFFFFFFFFFFC}), // 0b11111100
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x05}),               // 0b00000101
+			want: NewBitlistFrom([]uint64{0xFFFFFFFFFFFFFFFA}), // 0b11111010
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x06}),               // 0b00000110
+			want: NewBitlistFrom([]uint64{0xFFFFFFFFFFFFFFF9}), // 0b11111001
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x83}),               // 0b10000011
+			want: NewBitlistFrom([]uint64{0xFFFFFFFFFFFFFF7C}), // 0b01111100
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x13}),               // 0b00010011
+			want: NewBitlistFrom([]uint64{0xFFFFFFFFFFFFFFEC}), // 0b11101100
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x1F}),               // 0b00011111
+			want: NewBitlistFrom([]uint64{0xFFFFFFFFFFFFFFE0}), // 0b11100000
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x1F, 0x03}),                             // 0b00011111, 0b00000011
+			want: NewBitlistFrom([]uint64{0xFFFFFFFFFFFFFFE0, 0xFFFFFFFFFFFFFFFC}), // 0b11100000, 0b11111100
+		},
+		{
+			a:    NewBitlistFrom([]uint64{0x9F, 0x01}),                             // 0b10011111, 0b00000001
+			want: NewBitlistFrom([]uint64{0xFFFFFFFFFFFFFF60, 0xFFFFFFFFFFFFFFFE}), // 0b01100000, 0b11111110
+		},
+		{
+			a:    NewBitlistFrom([]uint64{allBitsSet, 0x02}),         // 0b11111111, 0x00000010
+			want: NewBitlistFrom([]uint64{0x00, 0xFFFFFFFFFFFFFFFD}), // 0b00000000, 0x11111101
+		},
+		{
+			a:    NewBitlistFrom([]uint64{allBitsSet, 0x87}),         // 0b11111111, 0x10000111
+			want: NewBitlistFrom([]uint64{0x00, 0xFFFFFFFFFFFFFF78}), // 0b00000000, 0x01111000
+		},
+		{
+			a:    NewBitlistFrom([]uint64{allBitsSet, 0x07}),         // 0b11111111, 0x00000111
+			want: NewBitlistFrom([]uint64{0x00, 0xFFFFFFFFFFFFFFF8}), // 0b00000000, 0x11111000
+		},
+	}
+
+	t.Run("Not()", func(t *testing.T) {
+		for _, tt := range tests {
+			if !reflect.DeepEqual(tt.a.Not().data, tt.want.data) {
+				t.Errorf("(%+v).Not() = %x, wanted %x", tt.a, tt.a.Not().data, tt.want)
+			}
+		}
+	})
+	t.Run("NoAllocNot()", func(t *testing.T) {
+		for _, tt := range tests {
+			res := tt.a.Clone()
+			// Make sure that no existing bits set interfere with operation. This is done to simulate
+			// the case when res variable is already populated from the previous run.
+			for i := uint64(0); i < res.Len(); i += 10 {
+				res.SetBitAt(i, true)
+			}
+			tt.a.NoAllocNot(res)
+			if !reflect.DeepEqual(res.data, tt.want.data) {
+				t.Errorf("(%+v).NoAllocNot() = %+v, wanted %x", tt.a, res.data, tt.want)
+			}
+		}
+	})
+}

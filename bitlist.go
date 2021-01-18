@@ -234,6 +234,30 @@ func (b *Bitlist) NoAllocXor(c, ret *Bitlist) {
 	}
 }
 
+// Not returns the NOT result of the bitfield (complement).
+func (b *Bitlist) Not() *Bitlist {
+	if b.Len() == 0 {
+		return b
+	}
+
+	ret := b.Clone()
+	b.NoAllocNot(ret)
+
+	return ret
+}
+
+// NoAllocNot returns the NOT result of the bitfield (complement).
+// Result is written into provided variable, so no allocation takes place inside the function.
+func (b *Bitlist) NoAllocNot(ret *Bitlist) {
+	if b.Len() == 0 {
+		return
+	}
+
+	for idx, word := range b.data {
+		ret.data[idx] = ^word
+	}
+}
+
 // Clone safely copies a given bitlist.
 func (b *Bitlist) Clone() *Bitlist {
 	c := NewBitlist(b.size)
