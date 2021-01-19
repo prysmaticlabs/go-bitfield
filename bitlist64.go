@@ -93,7 +93,12 @@ func (b *Bitlist64) Bytes() []byte {
 	// Clear any leading zero bytes.
 	allLeadingZeroes := 0
 	for i := len(b.data) - 1; i >= 0; i-- {
-		leadingZeroes := bits.LeadingZeros64(b.data[i])
+		leadingZeroes := 0
+		if b.data[i] == 0 {
+			leadingZeroes = int(wordSize)
+		} else {
+			leadingZeroes = bits.LeadingZeros64(b.data[i])
+		}
 		allLeadingZeroes += leadingZeroes
 		// If the whole word is 0x0, allow to test the next word, break otherwise.
 		if uint64(leadingZeroes) != wordSize {
