@@ -56,9 +56,8 @@ func (b *Bitlist64) BitAt(idx uint64) bool {
 	return b.data[idx>>wordSizeLog2]&i == i
 }
 
-// SetBitAt will set the bit at the given index to the given value. If the index
-// requested exceeds the number of bits in the bitlist, then this method returns
-// false.
+// SetBitAt will set the bit at the given index to the given value.
+// If the index requested exceeds the number of bits in the bitlist, then this method returns false.
 func (b *Bitlist64) SetBitAt(idx uint64, val bool) {
 	// Out of bounds, do nothing.
 	if idx >= b.size {
@@ -79,9 +78,8 @@ func (b *Bitlist64) Len() uint64 {
 }
 
 // Bytes returns underlying array of uint64s as an array of bytes.
-// The leading zeros in the bitlist will be trimmed to the smallest byte length
-// representation of the bitlist. This may produce an empty byte slice if all
-// bits were zero.
+// The leading zeros in the bitlist will be trimmed to the smallest byte length representation of
+// the bitlist. This may produce an empty byte slice if all bits were zero.
 func (b *Bitlist64) Bytes() []byte {
 	if len(b.data) == 0 {
 		return []byte{}
@@ -113,6 +111,7 @@ func (b *Bitlist64) Count() uint64 {
 	for _, bt := range b.data {
 		c += bits.OnesCount64(bt)
 	}
+
 	return uint64(c)
 }
 
@@ -132,6 +131,7 @@ func (b *Bitlist64) Contains(c *Bitlist64) bool {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -155,6 +155,7 @@ func (b *Bitlist64) Overlaps(c *Bitlist64) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
