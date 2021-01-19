@@ -1,7 +1,6 @@
 package bitfield
 
 import (
-	"bytes"
 	"encoding/binary"
 	"math/bits"
 )
@@ -85,11 +84,11 @@ func (b *Bitlist64) Bytes() []byte {
 		return []byte{}
 	}
 
-	buf := bytes.NewBuffer(make([]byte, 0, len(b.data)*bytesInWord))
-	if err := binary.Write(buf, binary.LittleEndian, b.data); err != nil {
-		return []byte{}
+	ret := make([]byte, len(b.data)*bytesInWord)
+	for idx, word := range b.data {
+		start := idx << bytesInWordLog2
+		binary.LittleEndian.PutUint64(ret[start:start+bytesInWord], word)
 	}
-	ret := buf.Bytes()
 
 	// Clear any leading zero bytes.
 	allLeadingZeroes := 0
