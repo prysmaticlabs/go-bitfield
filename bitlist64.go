@@ -271,6 +271,21 @@ func (b *Bitlist64) NoAllocXor(c, ret *Bitlist64) {
 	}
 }
 
+// XorCount calculates number of bits set in a symmetric difference of two bitfields.
+// This method will panic if the bitlists are not the same length.
+func (b *Bitlist64) XorCount(c *Bitlist64) uint64 {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	var cnt int
+	for idx := range b.data {
+		cnt += bits.OnesCount64(b.data[idx] ^ c.data[idx])
+	}
+
+	return uint64(cnt)
+}
+
 // Not returns the NOT result of the bitfield (complement).
 func (b *Bitlist64) Not() *Bitlist64 {
 	if b.Len() == 0 {
