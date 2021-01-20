@@ -673,6 +673,17 @@ func TestBitlist64_Contains(t *testing.T) {
 			t.Errorf("(%+v).Contains(%+v) = %t, wanted %t", tt.a, tt.b, tt.a.Contains(tt.b), tt.want)
 		}
 	}
+
+	t.Run("check panics", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Expected panic not thrown")
+			}
+		}()
+		a := NewBitlist64(64)
+		b := NewBitlist64(128)
+		a.Contains(b)
+	})
 }
 
 func TestBitlist64_Overlaps(t *testing.T) {
@@ -786,6 +797,17 @@ func TestBitlist64_Overlaps(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("check panics", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Expected panic not thrown")
+			}
+		}()
+		a := NewBitlist64(64)
+		b := NewBitlist64(128)
+		a.Overlaps(b)
+	})
 }
 
 func TestBitlist64_Or(t *testing.T) {
@@ -857,6 +879,40 @@ func TestBitlist64_Or(t *testing.T) {
 			}
 		}
 	})
+	t.Run("check panics", func(t *testing.T) {
+		t.Run("Or()", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("Expected panic not thrown")
+				}
+			}()
+			a := NewBitlist64(64)
+			b := NewBitlist64(128)
+			a.Or(b)
+		})
+		t.Run("NoAllocOr()", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("Expected panic not thrown")
+				}
+			}()
+			a := NewBitlist64(64)
+			b := NewBitlist64(128)
+			ret := NewBitlist64(64)
+			a.NoAllocOr(b, ret)
+		})
+		t.Run("NoAllocOr() wrong length of result param", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("Expected panic not thrown")
+				}
+			}()
+			a := NewBitlist64(64)
+			b := NewBitlist64(64)
+			ret := NewBitlist64(128)
+			a.NoAllocOr(b, ret)
+		})
+	})
 }
 
 func TestBitlist64_And(t *testing.T) {
@@ -927,6 +983,40 @@ func TestBitlist64_And(t *testing.T) {
 				t.Errorf("(%+v).NoAllocAnd(%+v) = %+v, wanted %x", tt.a, tt.b, res.data, tt.want)
 			}
 		}
+	})
+	t.Run("check panics", func(t *testing.T) {
+		t.Run("And()", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("Expected panic not thrown")
+				}
+			}()
+			a := NewBitlist64(64)
+			b := NewBitlist64(128)
+			a.And(b)
+		})
+		t.Run("NoAllocAnd()", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("Expected panic not thrown")
+				}
+			}()
+			a := NewBitlist64(64)
+			b := NewBitlist64(128)
+			ret := NewBitlist64(64)
+			a.NoAllocAnd(b, ret)
+		})
+		t.Run("NoAllocAnd() wrong length of result param", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("Expected panic not thrown")
+				}
+			}()
+			a := NewBitlist64(64)
+			b := NewBitlist64(64)
+			ret := NewBitlist64(128)
+			a.NoAllocAnd(b, ret)
+		})
 	})
 }
 
@@ -1003,6 +1093,40 @@ func TestBitlist64_Xor(t *testing.T) {
 				t.Errorf("(%+v).NoAllocXor(%+v) = %+v, wanted %x", tt.a, tt.b, res.data, tt.want)
 			}
 		}
+	})
+	t.Run("check panics", func(t *testing.T) {
+		t.Run("Xor()", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("Expected panic not thrown")
+				}
+			}()
+			a := NewBitlist64(64)
+			b := NewBitlist64(128)
+			a.Xor(b)
+		})
+		t.Run("NoAllocXor()", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("Expected panic not thrown")
+				}
+			}()
+			a := NewBitlist64(64)
+			b := NewBitlist64(128)
+			ret := NewBitlist64(64)
+			a.NoAllocXor(b, ret)
+		})
+		t.Run("NoAllocXor() wrong length of result param", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("Expected panic not thrown")
+				}
+			}()
+			a := NewBitlist64(64)
+			b := NewBitlist64(64)
+			ret := NewBitlist64(128)
+			a.NoAllocXor(b, ret)
+		})
 	})
 }
 
