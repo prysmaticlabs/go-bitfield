@@ -693,6 +693,11 @@ func TestBitlist64_Overlaps(t *testing.T) {
 		want bool
 	}{
 		{
+			a:    NewBitlist64From([]uint64{}), // zero-length bitlist
+			b:    NewBitlist64From([]uint64{}), // zero-length bitlist
+			want: false,
+		},
+		{
 			a:    NewBitlist64From([]uint64{0x06}), // 0b00000110
 			b:    NewBitlist64From([]uint64{0x05}), // 0b00000101
 			want: true,
@@ -1135,6 +1140,10 @@ func TestBitlist64_Not(t *testing.T) {
 		a    *Bitlist64
 		want *Bitlist64
 	}{
+		{
+			a:    NewBitlist64From([]uint64{}), // zero-length bitlist
+			want: NewBitlist64From([]uint64{}),
+		},
 		{
 			a:    NewBitlist64From([]uint64{0x01}),               // 0b00000001
 			want: NewBitlist64From([]uint64{0xFFFFFFFFFFFFFFFE}), // 0b11111110
