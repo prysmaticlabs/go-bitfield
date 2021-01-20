@@ -989,6 +989,13 @@ func TestBitlist64_And(t *testing.T) {
 			}
 		}
 	})
+	t.Run("AndCount()", func(t *testing.T) {
+		for _, tt := range tests {
+			if tt.a.AndCount(tt.b) != tt.want.Count() {
+				t.Errorf("(%+v).AndCount(%+v) = %d, wanted %d", tt.a, tt.b, tt.a.AndCount(tt.b), tt.want.Count())
+			}
+		}
+	})
 	t.Run("check panics", func(t *testing.T) {
 		t.Run("And()", func(t *testing.T) {
 			defer func() {
@@ -1021,6 +1028,16 @@ func TestBitlist64_And(t *testing.T) {
 			b := NewBitlist64(64)
 			ret := NewBitlist64(128)
 			a.NoAllocAnd(b, ret)
+		})
+		t.Run("AndCount()", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("Expected panic not thrown")
+				}
+			}()
+			a := NewBitlist64(64)
+			b := NewBitlist64(128)
+			a.AndCount(b)
 		})
 	})
 }

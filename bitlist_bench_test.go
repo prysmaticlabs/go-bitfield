@@ -378,6 +378,80 @@ func BenchmarkBitlist_And(b *testing.B) {
 	}
 }
 
+func BenchmarkBitlist_AndCount(b *testing.B) {
+	for n := uint64(0); n <= 2048; n += 256 {
+		b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {
+			b.Run("[]byte", func(b *testing.B) {
+				b.StopTimer()
+				s := NewBitlist(n)
+				s1 := NewBitlist(n) // has overlaps
+				s2 := NewBitlist(n) // no overlaps
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+					s1.SetBitAt(i, true)
+					s2.SetBitAt(i+1, true)
+				}
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.And(s1).Count()
+					s.And(s2).Count()
+				}
+			})
+			b.Run("[]uint64", func(b *testing.B) {
+				b.StopTimer()
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // has overlaps
+				s2 := NewBitlist64(n) // no overlaps
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+					s1.SetBitAt(i, true)
+					s2.SetBitAt(i+1, true)
+				}
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.And(s1).Count()
+					s.And(s2).Count()
+				}
+			})
+			b.Run("[]uint64 (noalloc)", func(b *testing.B) {
+				b.StopTimer()
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // has overlaps
+				s2 := NewBitlist64(n) // no overlaps
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+					s1.SetBitAt(i, true)
+					s2.SetBitAt(i+1, true)
+				}
+				result := s.Clone()
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.NoAllocAnd(s1, result)
+					result.Count()
+					s.NoAllocAnd(s2, result)
+					result.Count()
+				}
+			})
+			b.Run("[]uint64 (AndCount)", func(b *testing.B) {
+				b.StopTimer()
+				s := NewBitlist64(n)
+				s1 := NewBitlist64(n) // has overlaps
+				s2 := NewBitlist64(n) // no overlaps
+				for i := uint64(0); i < n; i += 100 {
+					s.SetBitAt(i, true)
+					s1.SetBitAt(i, true)
+					s2.SetBitAt(i+1, true)
+				}
+				b.StartTimer()
+				for i := 0; i < b.N; i++ {
+					s.AndCount(s1)
+					s.AndCount(s2)
+				}
+			})
+		})
+	}
+}
+
 func BenchmarkBitlist_Xor(b *testing.B) {
 	for n := uint64(0); n <= 2048; n += 256 {
 		b.Run(fmt.Sprintf("size:%d", n), func(b *testing.B) {

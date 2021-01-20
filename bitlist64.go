@@ -202,6 +202,21 @@ func (b *Bitlist64) And(c *Bitlist64) *Bitlist64 {
 	return ret
 }
 
+// AndCount calculates number of bits set to true in and intersection of two bitfields.
+// This method will panic if the bitlists are not the same length.
+func (b *Bitlist64) AndCount(c *Bitlist64) uint64 {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	var cnt int
+	for idx := range b.data {
+		cnt += bits.OnesCount64(b.data[idx] & c.data[idx])
+	}
+
+	return uint64(cnt)
+}
+
 // NoAllocAnd computes the AND result of the two bitfields (intersection).
 // Result is written into provided variable, so no allocation takes place inside the function.
 // This method will panic if the bitlists are not the same length.
