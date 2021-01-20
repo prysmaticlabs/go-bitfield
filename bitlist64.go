@@ -180,7 +180,7 @@ func (b *Bitlist64) Or(c *Bitlist64) *Bitlist64 {
 // Result is written into provided variable, so no allocation takes place inside the function.
 // This method will panic if the bitlists are not the same length.
 func (b *Bitlist64) NoAllocOr(c, ret *Bitlist64) {
-	if b.Len() != c.Len() {
+	if b.Len() != c.Len() || b.Len() != ret.Len() {
 		panic("bitlists are different lengths")
 	}
 
@@ -206,7 +206,7 @@ func (b *Bitlist64) And(c *Bitlist64) *Bitlist64 {
 // Result is written into provided variable, so no allocation takes place inside the function.
 // This method will panic if the bitlists are not the same length.
 func (b *Bitlist64) NoAllocAnd(c, ret *Bitlist64) {
-	if b.Len() != c.Len() {
+	if b.Len() != c.Len() || b.Len() != ret.Len() {
 		panic("bitlists are different lengths")
 	}
 
@@ -232,7 +232,7 @@ func (b *Bitlist64) Xor(c *Bitlist64) *Bitlist64 {
 // Result is written into provided variable, so no allocation takes place inside the function.
 // This method will panic if the bitlists are not the same length.
 func (b *Bitlist64) NoAllocXor(c, ret *Bitlist64) {
-	if b.Len() != c.Len() {
+	if b.Len() != c.Len() || b.Len() != ret.Len() {
 		panic("bitlists are different lengths")
 	}
 
