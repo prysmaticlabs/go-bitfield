@@ -189,6 +189,21 @@ func (b *Bitlist64) NoAllocOr(c, ret *Bitlist64) {
 	}
 }
 
+// OrCount calculates number of bits set in a union of two bitfields.
+// This method will panic if the bitlists are not the same length.
+func (b *Bitlist64) OrCount(c *Bitlist64) uint64 {
+	if b.Len() != c.Len() {
+		panic("bitlists are different lengths")
+	}
+
+	var cnt int
+	for idx := range b.data {
+		cnt += bits.OnesCount64(b.data[idx] | c.data[idx])
+	}
+
+	return uint64(cnt)
+}
+
 // And returns the AND result of the two bitfields (intersection).
 // This method will panic if the bitlists are not the same length.
 func (b *Bitlist64) And(c *Bitlist64) *Bitlist64 {
@@ -202,7 +217,7 @@ func (b *Bitlist64) And(c *Bitlist64) *Bitlist64 {
 	return ret
 }
 
-// AndCount calculates number of bits set to true in and intersection of two bitfields.
+// AndCount calculates number of bits set in an intersection of two bitfields.
 // This method will panic if the bitlists are not the same length.
 func (b *Bitlist64) AndCount(c *Bitlist64) uint64 {
 	if b.Len() != c.Len() {
