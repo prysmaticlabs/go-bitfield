@@ -308,6 +308,7 @@ func (b *Bitlist64) NoAllocNot(ret *Bitlist64) {
 	for idx, word := range b.data {
 		ret.data[idx] = ^word
 	}
+	ret.clearUnusedBits()
 }
 
 // BitIndices returns list of bit indexes of bitlist where value is set to true.
@@ -366,4 +367,12 @@ func (b *Bitlist64) Clone() *Bitlist64 {
 // numWordsRequired calculates how many words are required to hold bitlist of n bits.
 func numWordsRequired(n uint64) int {
 	return int((n + (wordSize - 1)) >> wordSizeLog2)
+}
+
+// clearUnusedBits zeroes unused bits in the last word.
+func (b *Bitlist64) clearUnusedBits() {
+	// Unless bitlist is divisible by a word evenly, we need to zero unused bits in the last word.
+	if !(b.size%wordSize == 0) {
+		b.data[len(b.data)-1] &= allBitsSet >> (wordSize - b.size%wordSize)
+	}
 }
