@@ -1196,6 +1196,16 @@ func TestBitlist64_Not(t *testing.T) {
 			want: NewBitlist64From([]uint64{}),
 		},
 		{
+			// Last word bits are unused, single word.
+			a:    NewBitlist64(3),                  // 0b*****000
+			want: NewBitlist64From([]uint64{0x07}), // 0b00000111
+		},
+		{
+			// Last word bits are unused, multiple words.
+			a:    NewBitlist64(131),                                        // 0x00..00, 0x00..00, 0b*****000
+			want: NewBitlist64From([]uint64{allBitsSet, allBitsSet, 0x07}), // 0xFF..FF, 0xFF..FF, 0b00000111
+		},
+		{
 			a:    NewBitlist64From([]uint64{0x01}),               // 0b00000001
 			want: NewBitlist64From([]uint64{0xFFFFFFFFFFFFFFFE}), // 0b11111110
 		},
@@ -1252,7 +1262,7 @@ func TestBitlist64_Not(t *testing.T) {
 	t.Run("Not()", func(t *testing.T) {
 		for _, tt := range tests {
 			if !reflect.DeepEqual(tt.a.Not().data, tt.want.data) {
-				t.Errorf("(%+v).Not() = %x, wanted %x", tt.a, tt.a.Not().data, tt.want)
+				t.Errorf("(%+v).Not() = %x, wanted %x", tt.a, tt.a.Not().data, tt.want.data)
 			}
 		}
 	})
