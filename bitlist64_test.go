@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestBitlist64_NewBitlist(t *testing.T) {
+func TestBitlist64_NewBitlist64(t *testing.T) {
 	makeData := func(n uint64) []uint64 {
 		return make([]uint64, n, n)
 	}
@@ -100,7 +100,7 @@ func TestBitlist64_NewBitlist(t *testing.T) {
 	}
 }
 
-func TestBitlist64_NewBitlistFrom(t *testing.T) {
+func TestBitlist64_NewBitlist64From(t *testing.T) {
 	tests := []struct {
 		from []uint64
 		want *Bitlist64
@@ -203,7 +203,7 @@ func TestBitlist64_NewBitlistFrom(t *testing.T) {
 	}
 }
 
-func TestBitlist64_NewBitlistFromBytes(t *testing.T) {
+func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 	tests := []struct {
 		from []byte
 		want *Bitlist64
