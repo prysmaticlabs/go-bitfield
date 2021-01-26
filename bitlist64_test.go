@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestBitlist64_NewBitlist(t *testing.T) {
+func TestBitlist64_NewBitlist64(t *testing.T) {
 	makeData := func(n uint64) []uint64 {
 		return make([]uint64, n, n)
 	}
@@ -100,7 +100,7 @@ func TestBitlist64_NewBitlist(t *testing.T) {
 	}
 }
 
-func TestBitlist64_NewBitlistFrom(t *testing.T) {
+func TestBitlist64_NewBitlist64From(t *testing.T) {
 	tests := []struct {
 		from []uint64
 		want *Bitlist64
@@ -198,6 +198,79 @@ func TestBitlist64_NewBitlistFrom(t *testing.T) {
 			got := NewBitlist64From(tt.from)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewBitlist64From(%#x) = %+v, wanted %+v", tt.from, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
+	tests := []struct {
+		from []byte
+		want *Bitlist64
+	}{
+		{
+			from: []byte{},
+			want: &Bitlist64{size: 0, data: []uint64{}},
+		},
+		{
+			from: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			want: &Bitlist64{size: 64, data: []uint64{0x0000000000000000}},
+		},
+		{
+			from: []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+			want: &Bitlist64{size: 64, data: []uint64{0xFFFFFFFFFFFFFFFF}},
+		},
+		{
+			from: []byte{
+				0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x01,
+			},
+			want: &Bitlist64{size: 128, data: []uint64{0x02, 0x01}},
+		},
+		{
+			from: []byte{0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0},
+			want: &Bitlist64{size: 64, data: []uint64{0xF0DEBC9A78563412}},
+		},
+		{
+			from: []byte{
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			},
+			want: &Bitlist64{size: 128, data: []uint64{0x00, 0x00}},
+		},
+		{
+			from: []byte{
+				0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+				0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+			},
+			want: &Bitlist64{size: 128, data: []uint64{0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF}},
+		},
+		{
+			from: []byte{
+				0xF1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+				0xF2, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+			},
+			want: &Bitlist64{size: 128, data: []uint64{0xFFFFFFFFFFFFFFF1, 0xFFFFFFFFFFFFFFF2}},
+		},
+		{
+			from: []byte{
+				0xF1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+				0xF2, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+				0xF3, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xF4,
+			},
+			want: &Bitlist64{size: 192, data: []uint64{
+				0xFFFFFFFFFFFFFFF1,
+				0xFFFFFFFFFFFFFFF2,
+				0x00F4FFFFFFFFFFF3,
+			}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("data:%#x", tt.from), func(t *testing.T) {
+			got := NewBitlist64FromBytes(tt.from)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewBitlist64FromBytes(%#x) = %+v, wanted %+v", tt.from, got, tt.want)
 			}
 		})
 	}

@@ -43,6 +43,26 @@ func NewBitlist64From(data []uint64) *Bitlist64 {
 	}
 }
 
+// NewBitlist64FromBytes creates a new bitlist for a given array of bytes.
+func NewBitlist64FromBytes(b []byte) *Bitlist64 {
+	// Extend input slice with zero bytes if it isn't evenly divisible by word size.
+	if numExtraBytes := len(b) % bytesInWord; numExtraBytes != 0 {
+		b = append(b, make([]byte, bytesInWord-numExtraBytes)...)
+	}
+
+	n := uint64(len(b) << bytesInWordLog2)
+	data := make([]uint64, numWordsRequired(n))
+	for i := 0; i < len(data); i++ {
+		idx := i << bytesInWordLog2
+		data[i] = binary.LittleEndian.Uint64(b[idx : idx+bytesInWord])
+	}
+
+	return &Bitlist64{
+		size: n,
+		data: data,
+	}
+}
+
 // BitAt returns the bit value at the given index. If the index requested
 // exceeds the number of bits in the bitlist, then this method returns false.
 func (b *Bitlist64) BitAt(idx uint64) bool {
