@@ -110,6 +110,30 @@ func (b Bitlist) Bytes() []byte {
 	return ret[:newLen]
 }
 
+// BytesNoTrim returns the underlying byte array without the length bit.
+// No trimming of leading zeros occurs, only size bit is cleared.
+func (b Bitlist) BytesNoTrim() []byte {
+	if len(b) == 0 {
+		return []byte{}
+	}
+
+	lenB := len(b)
+	ret := make([]byte, lenB)
+	copy(ret, b)
+
+	// If last byte contains only size bit, return without that byte.
+	if ret[lenB-1] == 0x0 || ret[lenB-1] == 0x1 {
+		return ret[:lenB-1]
+	}
+
+	// Clear the most significant bit (the length bit).
+	msb := uint8(bits.Len8(ret[len(ret)-1])) - 1
+	clearBit := uint8(1 << msb)
+	ret[len(ret)-1] &^= clearBit
+
+	return ret
+}
+
 // Count returns the number of 1s in the bitlist.
 func (b Bitlist) Count() uint64 {
 	c := 0
