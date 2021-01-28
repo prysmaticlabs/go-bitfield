@@ -363,6 +363,69 @@ func TestBitlist_Bytes(t *testing.T) {
 	}
 }
 
+func TestBitlist_BytesNoTrim(t *testing.T) {
+	tests := []struct {
+		bitlist Bitlist
+		want    []byte
+	}{
+		{
+			bitlist: Bitlist{},
+			want:    []byte{},
+		},
+		{
+			bitlist: Bitlist{0x00},
+			want:    []byte{},
+		},
+		{
+			bitlist: Bitlist{0x01},
+			want:    []byte{},
+		},
+		{
+			bitlist: Bitlist{0x02},
+			want:    []byte{0x00},
+		},
+		{
+			bitlist: Bitlist{0x03},
+			want:    []byte{0x01},
+		},
+		{
+			bitlist: Bitlist{0x12},
+			want:    []byte{0x02},
+		},
+		{
+			bitlist: Bitlist{0x02, 0x01},
+			want:    []byte{0x02},
+		},
+		{
+			bitlist: Bitlist{0x02, 0x02},
+			want:    []byte{0x02, 0x00},
+		},
+		{
+			bitlist: Bitlist{0x02, 0x03},
+			want:    []byte{0x02, 0x01},
+		},
+		{
+			bitlist: Bitlist{0x01, 0x00, 0x08},
+			want:    []byte{0x01, 0x00, 0x00},
+		},
+		{
+			bitlist: Bitlist{0x00, 0x00, 0x02},
+			want:    []byte{0x00, 0x00, 0x00},
+		},
+		{
+			bitlist: Bitlist{0x00, 0x00, 0x01},
+			want:    []byte{0x00, 0x00},
+		},
+	}
+
+	for _, tt := range tests {
+		got := tt.bitlist.BytesNoTrim()
+		if !bytes.Equal(got, tt.want) {
+			t.Errorf("(%#x).BytesNoTrim() = %#v, wanted %#v", tt.bitlist, got, tt.want)
+		}
+	}
+}
+
 func TestBitlist_Count(t *testing.T) {
 	tests := []struct {
 		bitlist Bitlist
