@@ -129,6 +129,22 @@ func (b *Bitlist64) Bytes() []byte {
 	return ret[:len(ret)-allLeadingZeroes>>bytesInWordLog2]
 }
 
+// ToBitlist converts []uint64 backed bitlist into []byte backed bitlist.
+func (b *Bitlist64) ToBitlist() Bitlist {
+	if len(b.data) == 0 {
+		return Bitlist{}
+	}
+
+	ret := make([]byte, len(b.data)*bytesInWord)
+	for idx, word := range b.data {
+		start := idx << bytesInWordLog2
+		binary.LittleEndian.PutUint64(ret[start:start+bytesInWord], word)
+	}
+
+	// Append size byte when returning.
+	return append(ret, 0x1)
+}
+
 // Count returns the number of 1s in the bitlist.
 func (b *Bitlist64) Count() uint64 {
 	c := 0

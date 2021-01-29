@@ -134,6 +134,11 @@ func (b Bitlist) BytesNoTrim() []byte {
 	return ret
 }
 
+// ToBitlist64 converts []byte backed bitlist into []uint64 backed bitlist.
+func (b Bitlist) ToBitlist64() *Bitlist64 {
+	return NewBitlist64FromBytes(b.BytesNoTrim())
+}
+
 // Count returns the number of 1s in the bitlist.
 func (b Bitlist) Count() uint64 {
 	c := 0
