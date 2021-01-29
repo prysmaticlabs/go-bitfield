@@ -350,6 +350,10 @@ func TestBitlist64_ToBitlist(t *testing.T) {
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToBitlist(%#x) = %+v, wanted %+v", tt.from, got, tt.want)
 			}
+			from := tt.from.ToBitlist().ToBitlist64()
+			if !reflect.DeepEqual(from, tt.from) {
+				t.Errorf("ToBitlist(%#x).ToBitlist64() = %+v, wanted %+v", tt.from, from, tt.from)
+			}
 		})
 	}
 }
