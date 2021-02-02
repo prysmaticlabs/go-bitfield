@@ -428,165 +428,93 @@ func TestBitlist_BytesNoTrim(t *testing.T) {
 
 func TestBitlist_ToBitlist64(t *testing.T) {
 	tests := []struct {
-		bitlist Bitlist
-		want    *Bitlist64
+		size            uint64
+		selectedIndices []uint64
 	}{
 		{
-			bitlist: Bitlist{},
-			want: &Bitlist64{
-				size: 0,
-				data: []uint64{},
-			},
+			size:            0,
+			selectedIndices: []uint64{},
 		},
 		{
-			bitlist: Bitlist{0x00},
-			want: &Bitlist64{
-				size: 0,
-				data: []uint64{},
-			},
+			size:            1,
+			selectedIndices: []uint64{0},
 		},
 		{
-			bitlist: Bitlist{0x01},
-			want: &Bitlist64{
-				size: 0,
-				data: []uint64{},
-			},
+			size:            2,
+			selectedIndices: []uint64{0, 1},
 		},
 		{
-			bitlist: Bitlist{0x02},
-			want: &Bitlist64{
-				size: 64,
-				data: []uint64{0x00},
-			},
+			size:            7,
+			selectedIndices: []uint64{0, 1, 6},
 		},
 		{
-			bitlist: Bitlist{0x03},
-			want: &Bitlist64{
-				size: 64,
-				data: []uint64{0x01},
-			},
+			size:            8,
+			selectedIndices: []uint64{0, 1, 6, 7},
 		},
 		{
-			bitlist: Bitlist{0x12},
-			want: &Bitlist64{
-				size: 64,
-				data: []uint64{0x02},
-			},
+			size:            9,
+			selectedIndices: []uint64{3, 4},
 		},
 		{
-			bitlist: Bitlist{0x02, 0x01},
-			want: &Bitlist64{
-				size: 64,
-				data: []uint64{0x02},
-			},
+			size:            60,
+			selectedIndices: []uint64{0, 2, 50},
 		},
 		{
-			bitlist: Bitlist{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01,
-			},
-			want: &Bitlist64{
-				size: 64,
-				data: []uint64{0x02000000000000},
-			},
+			size:            64,
+			selectedIndices: []uint64{0, 2, 63},
 		},
 		{
-			bitlist: Bitlist{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01,
-			},
-			want: &Bitlist64{
-				size: 64,
-				data: []uint64{0x0200000000000000},
-			},
+			size:            69,
+			selectedIndices: []uint64{0, 2, 63, 67},
 		},
 		{
-			bitlist: Bitlist{
-				0x04, 0x05, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x02, 0x01,
-			},
-			want: &Bitlist64{
-				size: 128,
-				data: []uint64{0x0000000000060504, 0x0000000000020000},
-			},
+			size:            128,
+			selectedIndices: []uint64{0, 2, 63, 67, 120},
 		},
 		{
-			bitlist: Bitlist{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x02,
-			},
-			want: &Bitlist64{
-				size: 128,
-				data: []uint64{0x0200000000000000, 0x0002000000000000},
-			},
+			size:            128,
+			selectedIndices: []uint64{0, 2, 63, 67, 90, 100, 120, 126, 127},
 		},
 		{
-			bitlist: Bitlist{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x02,
-			},
-			want: &Bitlist64{
-				size: 192,
-				data: []uint64{0x00, 0x0200000000000000, 0x0002000000000000},
-			},
-		},
-		{
-			bitlist: Bitlist{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x03,
-			},
-			want: &Bitlist64{
-				size: 128,
-				data: []uint64{0x0200000000000000, 0x0102000000000000},
-			},
-		},
-		{
-			bitlist: Bitlist{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x08,
-			},
-			want: &Bitlist64{
-				size: 128,
-				data: []uint64{0x0200000000000000, 0x0002000000000000},
-			},
-		},
-		{
-			bitlist: Bitlist{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
-			},
-			want: &Bitlist64{
-				size: 192,
-				data: []uint64{0x00, 0x00, 0x00},
-			},
-		},
-		{
-			bitlist: Bitlist{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
-			},
-			want: &Bitlist64{
-				size: 128,
-				data: []uint64{0x00, 0x00},
-			},
-		},
-		{
-			bitlist: Bitlist{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
-			},
-			want: &Bitlist64{
-				size: 128,
-				data: []uint64{0x00, 0x00},
-			},
+			size:            192,
+			selectedIndices: []uint64{0, 2, 63, 67, 90, 100, 120, 126, 127, 150, 170},
 		},
 	}
 
-	for _, tt := range tests {
-		got := tt.bitlist.ToBitlist64()
-		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("(%#x).ToBitlist64() = %#v, wanted %#v", tt.bitlist, got, tt.want)
+	selectIndices := func(b Bitfield, indices []uint64) Bitfield {
+		for _, idx := range indices {
+			b.SetBitAt(idx, true)
 		}
+		return b
+	}
+	createBitlist64 := func(n uint64, indices []uint64) *Bitlist64 {
+		return (selectIndices(NewBitlist64(n), indices)).(*Bitlist64)
+	}
+	createBitlist := func(n uint64, indices []uint64) Bitlist {
+		return (selectIndices(NewBitlist(n), indices)).(Bitlist)
+	}
+
+	for _, tt := range tests {
+		source := createBitlist(tt.size, tt.selectedIndices)
+		wanted := createBitlist64(tt.size, tt.selectedIndices)
+		t.Run(fmt.Sprintf("size:%d,indices:%v", tt.size, tt.selectedIndices), func(t *testing.T) {
+			// Convert to Bitlist64.
+			got := source.ToBitlist64()
+			if !reflect.DeepEqual(got, wanted) {
+				t.Errorf("ToBitlist64(%#x) = %#b, wanted %#b", source, got, wanted)
+			}
+
+			// Now convert back, and compare to the original.
+			gotSource := got.ToBitlist()
+			if !reflect.DeepEqual(gotSource, source) {
+				t.Errorf("ToBitlist64(%#x).ToBitlist() = %+v, wanted %+v", source, gotSource, source)
+			}
+
+			// Make sure that both Bitlist and Bitlist64 Bytes() are equal.
+			if !bytes.Equal(source.Bytes(), got.Bytes()) {
+				t.Errorf("original.Bytes() != converted.Bytes() (%#x != %#x)", source.Bytes(), got.Bytes())
+			}
+		})
 	}
 }
 

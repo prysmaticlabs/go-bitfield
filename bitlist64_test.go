@@ -374,7 +374,7 @@ func TestBitlist64_ToBitlist(t *testing.T) {
 		source := createBitlist64(tt.size, tt.selectedIndices)
 		wanted := createBitlist(tt.size, tt.selectedIndices)
 		t.Run(fmt.Sprintf("size:%d,indices:%v", tt.size, tt.selectedIndices), func(t *testing.T) {
-			// Convert to bitlist.
+			// Convert to Bitlist.
 			got := source.ToBitlist()
 			if !reflect.DeepEqual(got, wanted) {
 				t.Errorf("ToBitlist(%#x) = %#b, wanted %#b", source, got, wanted)
