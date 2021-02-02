@@ -64,6 +64,10 @@ func TestBitlist64_NewBitlist64(t *testing.T) {
 			want: &Bitlist64{size: 128, data: []uint64{0x00, 0x00}},
 		},
 		{
+			size: 129,
+			want: &Bitlist64{size: 129, data: []uint64{0x00, 0x00, 0x00}},
+		},
+		{
 			size: 256,
 			want: &Bitlist64{size: 256, data: []uint64{0x00, 0x00, 0x00, 0x00}},
 		},
@@ -206,6 +210,7 @@ func TestBitlist64_NewBitlist64From(t *testing.T) {
 func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 	tests := []struct {
 		from []byte
+		size uint64
 		want *Bitlist64
 	}{
 		{
@@ -213,11 +218,18 @@ func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 			want: &Bitlist64{size: 0, data: []uint64{}},
 		},
 		{
-			from: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-			want: &Bitlist64{size: 64, data: []uint64{0x0000000000000000}},
+			from: []byte{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			size: 64,
+			want: &Bitlist64{size: 64, data: []uint64{0x0000000000000001}},
+		},
+		{
+			from: []byte{0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			size: 63,
+			want: &Bitlist64{size: 63, data: []uint64{0x0000000000000002}},
 		},
 		{
 			from: []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+			size: 64,
 			want: &Bitlist64{size: 64, data: []uint64{0xFFFFFFFFFFFFFFFF}},
 		},
 		{
@@ -225,10 +237,20 @@ func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 				0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x01,
 			},
-			want: &Bitlist64{size: 128, data: []uint64{0x02, 0x01}},
+			size: 70,
+			want: &Bitlist64{size: 70, data: []uint64{0x02, 0x01}},
+		},
+		{
+			from: []byte{
+				0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x01,
+			},
+			size: 72,
+			want: &Bitlist64{size: 72, data: []uint64{0x02, 0x01}},
 		},
 		{
 			from: []byte{0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0},
+			size: 64,
 			want: &Bitlist64{size: 64, data: []uint64{0xF0DEBC9A78563412}},
 		},
 		{
@@ -236,6 +258,7 @@ func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			},
+			size: 128,
 			want: &Bitlist64{size: 128, data: []uint64{0x00, 0x00}},
 		},
 		{
@@ -243,6 +266,7 @@ func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 				0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 				0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 			},
+			size: 128,
 			want: &Bitlist64{size: 128, data: []uint64{0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF}},
 		},
 		{
@@ -250,6 +274,7 @@ func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 				0xF1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 				0xF2, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 			},
+			size: 128,
 			want: &Bitlist64{size: 128, data: []uint64{0xFFFFFFFFFFFFFFF1, 0xFFFFFFFFFFFFFFF2}},
 		},
 		{
@@ -258,7 +283,8 @@ func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 				0xF2, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 				0xF3, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xF4,
 			},
-			want: &Bitlist64{size: 192, data: []uint64{
+			size: 184,
+			want: &Bitlist64{size: 184, data: []uint64{
 				0xFFFFFFFFFFFFFFF1,
 				0xFFFFFFFFFFFFFFF2,
 				0x00F4FFFFFFFFFFF3,
@@ -267,10 +293,10 @@ func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(fmt.Sprintf("data:%#x", tt.from), func(t *testing.T) {
-			got := NewBitlist64FromBytes(tt.from)
+		t.Run(fmt.Sprintf("NewBitlist64FromBytes(%d, %#x)", tt.size, tt.from), func(t *testing.T) {
+			got := NewBitlist64FromBytes(tt.size, tt.from)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewBitlist64FromBytes(%#x) = %+v, wanted %+v", tt.from, got, tt.want)
+				t.Errorf("NewBitlist64FromBytes(%d, %#x) = %+v, wanted %+v", tt.size, tt.from, got, tt.want)
 			}
 		})
 	}

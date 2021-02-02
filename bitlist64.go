@@ -2,6 +2,7 @@ package bitfield
 
 import (
 	"encoding/binary"
+	"fmt"
 	"math/bits"
 )
 
@@ -27,7 +28,7 @@ type Bitlist64 struct {
 	data []uint64
 }
 
-// NewBitlist64 creates a new bitlist of size N.
+// NewBitlist64 creates a new bitlist of size `n`.
 func NewBitlist64(n uint64) *Bitlist64 {
 	return &Bitlist64{
 		size: n,
@@ -44,13 +45,17 @@ func NewBitlist64From(data []uint64) *Bitlist64 {
 }
 
 // NewBitlist64FromBytes creates a new bitlist for a given array of bytes.
-func NewBitlist64FromBytes(b []byte) *Bitlist64 {
+// Size of the bitlist is explicitly specified via `n` (since number of bits required may not align
+// perfectly to the word size).
+func NewBitlist64FromBytes(n uint64, b []byte) *Bitlist64 {
+	if n > uint64(len(b)<<3) {
+		panic(fmt.Sprintf("an array of %d bytes is not enough to hold n=%d bits.", len(b), n))
+	}
 	// Extend input slice with zero bytes if it isn't evenly divisible by word size.
 	if numExtraBytes := len(b) % bytesInWord; numExtraBytes != 0 {
 		b = append(b, make([]byte, bytesInWord-numExtraBytes)...)
 	}
 
-	n := uint64(len(b) << bytesInWordLog2)
 	data := make([]uint64, numWordsRequired(n))
 	for i := 0; i < len(data); i++ {
 		idx := i << bytesInWordLog2
