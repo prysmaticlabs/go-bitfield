@@ -304,81 +304,91 @@ func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 
 func TestBitlist64_ToBitlist(t *testing.T) {
 	tests := []struct {
-		from *Bitlist64
-		want Bitlist
+		size            uint64
+		selectedIndices []uint64
 	}{
 		{
-			from: &Bitlist64{size: 0, data: []uint64{}},
-			want: Bitlist{},
+			size:            0,
+			selectedIndices: []uint64{},
 		},
 		{
-			from: &Bitlist64{size: 64, data: []uint64{0x0000000000000000}},
-			want: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
+			size:            1,
+			selectedIndices: []uint64{0},
 		},
 		{
-			from: &Bitlist64{size: 64, data: []uint64{0xFFFFFFFFFFFFFFFF}},
-			want: []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01},
+			size:            2,
+			selectedIndices: []uint64{0, 1},
 		},
 		{
-			from: &Bitlist64{size: 128, data: []uint64{0x02, 0x01}},
-			want: []byte{
-				0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x01,
-			},
+			size:            7,
+			selectedIndices: []uint64{0, 1, 6},
 		},
 		{
-			from: &Bitlist64{size: 64, data: []uint64{0xF0DEBC9A78563412}},
-			want: []byte{0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x01},
+			size:            8,
+			selectedIndices: []uint64{0, 1, 6, 7},
 		},
 		{
-			from: &Bitlist64{size: 128, data: []uint64{0x00, 0x00}},
-			want: []byte{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x01,
-			},
+			size:            9,
+			selectedIndices: []uint64{3, 4},
 		},
 		{
-			from: &Bitlist64{size: 128, data: []uint64{0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF}},
-			want: []byte{
-				0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-				0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-				0x01,
-			},
+			size:            60,
+			selectedIndices: []uint64{0, 2, 50},
 		},
 		{
-			from: &Bitlist64{size: 128, data: []uint64{0xFFFFFFFFFFFFFFF1, 0xFFFFFFFFFFFFFFF2}},
-			want: []byte{
-				0xF1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-				0xF2, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-				0x01,
-			},
+			size:            64,
+			selectedIndices: []uint64{0, 2, 63},
 		},
 		{
-			from: &Bitlist64{size: 192, data: []uint64{
-				0xFFFFFFFFFFFFFFF1,
-				0xFFFFFFFFFFFFFFF2,
-				0x00F4FFFFFFFFFFF3,
-			}},
-			want: []byte{
-				0xF1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-				0xF2, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-				0xF3, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xF4, 0x00,
-				0x01,
-			},
+			size:            69,
+			selectedIndices: []uint64{0, 2, 63, 67},
+		},
+		{
+			size:            128,
+			selectedIndices: []uint64{0, 2, 63, 67, 120},
+		},
+		{
+			size:            128,
+			selectedIndices: []uint64{0, 2, 63, 67, 90, 100, 120, 126, 127},
+		},
+		{
+			size:            192,
+			selectedIndices: []uint64{0, 2, 63, 67, 90, 100, 120, 126, 127, 150, 170},
 		},
 	}
 
+	selectIndices := func(b Bitfield, indices []uint64) Bitfield {
+		for _, idx := range indices {
+			b.SetBitAt(idx, true)
+		}
+		return b
+	}
+	createBitlist64 := func(n uint64, indices []uint64) *Bitlist64 {
+		return (selectIndices(NewBitlist64(n), indices)).(*Bitlist64)
+	}
+	createBitlist := func(n uint64, indices []uint64) Bitlist {
+		return (selectIndices(NewBitlist(n), indices)).(Bitlist)
+	}
+
 	for _, tt := range tests {
-		t.Run(fmt.Sprintf("data:%#x", tt.from), func(t *testing.T) {
-			got := tt.from.ToBitlist()
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ToBitlist(%#x) = %+v, wanted %+v", tt.from, got, tt.want)
+		source := createBitlist64(tt.size, tt.selectedIndices)
+		wanted := createBitlist(tt.size, tt.selectedIndices)
+		t.Run(fmt.Sprintf("size:%d,indices:%v", tt.size, tt.selectedIndices), func(t *testing.T) {
+			// Convert to bitlist.
+			got := source.ToBitlist()
+			if !reflect.DeepEqual(got, wanted) {
+				t.Errorf("ToBitlist(%#x) = %#b, wanted %#b", source, got, wanted)
 			}
-			from := tt.from.ToBitlist().ToBitlist64()
-			if !reflect.DeepEqual(from, tt.from) {
-				t.Errorf("ToBitlist(%#x).ToBitlist64() = %+v, wanted %+v", tt.from, from, tt.from)
+
+			// Now convert back, and compare to the original.
+			gotSource := got.ToBitlist64()
+			if !reflect.DeepEqual(gotSource, source) {
+				t.Errorf("ToBitlist(%#x).ToBitlist64() = %+v, wanted %+v", source, gotSource, source)
+			}
+
+			// Make sure that both Bitlist and Bitlist64 Bytes() are equal.
+			if !bytes.Equal(source.Bytes(), got.Bytes()) {
+				t.Errorf("original.Bytes() != converted.Bytes() (%#x != %#x)", source.Bytes(), got.Bytes())
 			}
 		})
 	}

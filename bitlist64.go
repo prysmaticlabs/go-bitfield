@@ -136,8 +136,8 @@ func (b *Bitlist64) Bytes() []byte {
 
 // ToBitlist converts []uint64 backed bitlist into []byte backed bitlist.
 func (b *Bitlist64) ToBitlist() Bitlist {
-	if len(b.data) == 0 {
-		return Bitlist{}
+	if len(b.data) == 0 || b.size == 0 {
+		return NewBitlist(0)
 	}
 
 	ret := make([]byte, len(b.data)*bytesInWord)
@@ -146,8 +146,20 @@ func (b *Bitlist64) ToBitlist() Bitlist {
 		binary.LittleEndian.PutUint64(ret[start:start+bytesInWord], word)
 	}
 
-	// Append size byte when returning.
-	return append(ret, 0x1)
+	// Append size bit. If number of bits align evenly with number byte size (8), add extra byte.
+	// Otherwise, set the most significant bit as a length bit.
+	if b.size%8 == 0 {
+		// Limit number of bits to a known size. Add extra byte, with size bit set.
+		ret = append(ret[:b.size>>3], 0x1)
+	} else {
+		// Limit number of bits to a known size.
+		ret = ret[:b.size>>3+1]
+		// Set size bit on the last byte.
+		idx := uint8(1 << (b.size % 8))
+		ret[len(ret)-1] |= idx
+	}
+
+	return ret
 }
 
 // Count returns the number of 1s in the bitlist.
