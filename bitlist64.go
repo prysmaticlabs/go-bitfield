@@ -2,6 +2,7 @@ package bitfield
 
 import (
 	"encoding/binary"
+	"fmt"
 	"math/bits"
 )
 
@@ -27,7 +28,7 @@ type Bitlist64 struct {
 	data []uint64
 }
 
-// NewBitlist64 creates a new bitlist of size N.
+// NewBitlist64 creates a new bitlist of size `n`.
 func NewBitlist64(n uint64) *Bitlist64 {
 	return &Bitlist64{
 		size: n,
@@ -44,13 +45,17 @@ func NewBitlist64From(data []uint64) *Bitlist64 {
 }
 
 // NewBitlist64FromBytes creates a new bitlist for a given array of bytes.
-func NewBitlist64FromBytes(b []byte) *Bitlist64 {
+// Size of the bitlist is explicitly specified via `n` (since number of bits required may not align
+// perfectly to the word size).
+func NewBitlist64FromBytes(n uint64, b []byte) *Bitlist64 {
+	if n > uint64(len(b)<<3) {
+		panic(fmt.Sprintf("an array of %d bytes is not enough to hold n=%d bits.", len(b), n))
+	}
 	// Extend input slice with zero bytes if it isn't evenly divisible by word size.
 	if numExtraBytes := len(b) % bytesInWord; numExtraBytes != 0 {
 		b = append(b, make([]byte, bytesInWord-numExtraBytes)...)
 	}
 
-	n := uint64(len(b) << bytesInWordLog2)
 	data := make([]uint64, numWordsRequired(n))
 	for i := 0; i < len(data); i++ {
 		idx := i << bytesInWordLog2
@@ -131,8 +136,8 @@ func (b *Bitlist64) Bytes() []byte {
 
 // ToBitlist converts []uint64 backed bitlist into []byte backed bitlist.
 func (b *Bitlist64) ToBitlist() Bitlist {
-	if len(b.data) == 0 {
-		return Bitlist{}
+	if len(b.data) == 0 || b.size == 0 {
+		return NewBitlist(0)
 	}
 
 	ret := make([]byte, len(b.data)*bytesInWord)
@@ -141,8 +146,20 @@ func (b *Bitlist64) ToBitlist() Bitlist {
 		binary.LittleEndian.PutUint64(ret[start:start+bytesInWord], word)
 	}
 
-	// Append size byte when returning.
-	return append(ret, 0x1)
+	// Append size bit. If number of bits align evenly with number byte size (8), add extra byte.
+	// Otherwise, set the most significant bit as a length bit.
+	if b.size%8 == 0 {
+		// Limit number of bits to a known size. Add extra byte, with size bit set.
+		ret = append(ret[:b.size>>3], 0x1)
+	} else {
+		// Limit number of bits to a known size.
+		ret = ret[:b.size>>3+1]
+		// Set size bit on the last byte.
+		idx := uint8(1 << (b.size % 8))
+		ret[len(ret)-1] |= idx
+	}
+
+	return ret
 }
 
 // Count returns the number of 1s in the bitlist.
