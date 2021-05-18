@@ -21,7 +21,7 @@ func NewBitvector512() Bitvector512 {
 // exceeds the number of bits in the bitvector, then this method returns false.
 func (b Bitvector512) BitAt(idx uint64) bool {
 	// Out of bounds, must be false.
-	if idx >= b.Len() {
+	if idx >= b.Len() || idx >= 512 {
 		return false
 	}
 
@@ -34,7 +34,7 @@ func (b Bitvector512) BitAt(idx uint64) bool {
 // false.
 func (b Bitvector512) SetBitAt(idx uint64, val bool) {
 	// Out of bounds, do nothing.
-	if idx >= b.Len() {
+	if idx >= b.Len() || idx >= 512 {
 		return
 	}
 
