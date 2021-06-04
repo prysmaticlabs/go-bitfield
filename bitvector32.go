@@ -12,7 +12,7 @@ type Bitvector32 []byte
 
 // NewBitvector32 creates a new bitvector of size 32.
 func NewBitvector32() Bitvector32 {
-	byteArray := [8]byte{}
+	byteArray := [4]byte{}
 	return byteArray[:]
 }
 
@@ -47,7 +47,7 @@ func (b Bitvector32) SetBitAt(idx uint64, val bool) {
 
 // Len returns the number of bits in the bitvector.
 func (b Bitvector32) Len() uint64 {
-	return uint64(len(b) * 8)
+	return 32
 }
 
 // Count returns the number of 1s in the bitvector.
