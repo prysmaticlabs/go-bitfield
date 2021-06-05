@@ -10,6 +10,12 @@ var _ = Bitfield(Bitvector4{})
 // present in the underlying byte array.
 type Bitvector4 []byte
 
+// NewBitvector4 creates a new bitvector of size 4.
+func NewBitvector4() Bitvector4 {
+	byteArray := [4]byte{}
+	return byteArray[:]
+}
+
 // BitAt returns the bit value at the given index. If the index requested
 // exceeds the number of bits in the bitvector, then this method returns false.
 func (b Bitvector4) BitAt(idx uint64) bool {
