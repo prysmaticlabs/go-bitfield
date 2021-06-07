@@ -10,9 +10,12 @@ var _ = Bitfield(Bitvector8{})
 // present in the underlying byte array.
 type Bitvector8 []byte
 
+const bitvector8ByteSize = 1
+const bitvector8BitSize = bitvector8ByteSize * 8
+
 // NewBitvector8 creates a new bitvector of size 8.
 func NewBitvector8() Bitvector8 {
-	byteArray := [1]byte{}
+	byteArray := [bitvector8ByteSize]byte{}
 	return byteArray[:]
 }
 
@@ -47,7 +50,7 @@ func (b Bitvector8) SetBitAt(idx uint64, val bool) {
 
 // Len returns the number of bits in the bitvector.
 func (b Bitvector8) Len() uint64 {
-	return 8
+	return bitvector8BitSize
 }
 
 // Count returns the number of 1s in the bitvector.
@@ -58,11 +61,15 @@ func (b Bitvector8) Count() uint64 {
 	return uint64(bits.OnesCount8(b[0]))
 }
 
-// Bytes returns the bytes data representing the Bitvector8. This method
-// bitmasks the underlying data to ensure that it is an accurate representation.
+// Bytes returns the bytes data representing the Bitvector8.
 func (b Bitvector8) Bytes() []byte {
 	if len(b) == 0 {
 		return []byte{}
+	}
+	if len(b) > bitvector8ByteSize {
+		ret := make([]byte, bitvector8ByteSize)
+		copy(ret, b[:bitvector8ByteSize])
+		return ret[:]
 	}
 	return b
 }
@@ -71,6 +78,9 @@ func (b Bitvector8) Bytes() []byte {
 func (b Bitvector8) BitIndices() []int {
 	indices := make([]int, 0, 8)
 	for i, bt := range b {
+		if i >= bitvector8ByteSize {
+			break
+		}
 		for j := 0; j < 8; j++ {
 			bit := byte(1 << uint(j))
 			if bt&bit == bit {

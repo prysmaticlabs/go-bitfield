@@ -10,9 +10,12 @@ var _ = Bitfield(Bitvector32{})
 // present in the underlying byte array.
 type Bitvector32 []byte
 
+const bitvector32ByteSize = 4
+const bitvector32BitSize = bitvector32ByteSize * 8
+
 // NewBitvector32 creates a new bitvector of size 32.
 func NewBitvector32() Bitvector32 {
-	byteArray := [4]byte{}
+	byteArray := [bitvector32ByteSize]byte{}
 	return byteArray[:]
 }
 
@@ -47,7 +50,7 @@ func (b Bitvector32) SetBitAt(idx uint64, val bool) {
 
 // Len returns the number of bits in the bitvector.
 func (b Bitvector32) Len() uint64 {
-	return 32
+	return bitvector32BitSize
 }
 
 // Count returns the number of 1s in the bitvector.
@@ -56,26 +59,33 @@ func (b Bitvector32) Count() uint64 {
 		return 0
 	}
 	c := 0
-	for _, bt := range b {
+	for i, bt := range b {
+		if i >= bitvector32ByteSize {
+			break
+		}
 		c += bits.OnesCount8(bt)
 	}
 	return uint64(c)
 }
 
-// Bytes returns the bytes data representing the bitvector32. This method
-// bitmasks the underlying data to ensure that it is an accurate representation.
+// Bytes returns the bytes data representing the bitvector32.
 func (b Bitvector32) Bytes() []byte {
 	if len(b) == 0 {
 		return []byte{}
 	}
-	ret := make([]byte, len(b))
-	copy(ret, b[:])
+	ln := min(len(b), bitvector32ByteSize)
+	ret := make([]byte, ln)
+	copy(ret, b[:ln])
 	return ret[:]
 }
 
+// BitIndices returns the list of indices which are set to 1.
 func (b Bitvector32) BitIndices() []int {
-	indices := make([]int, 0, 32)
+	indices := make([]int, 0, bitvector32BitSize)
 	for i, bt := range b {
+		if i >= bitvector32ByteSize {
+			break
+		}
 		for j := 0; j < 8; j++ {
 			bit := byte(1 << uint(j))
 			if bt&bit == bit {

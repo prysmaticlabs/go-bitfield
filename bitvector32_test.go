@@ -185,6 +185,10 @@ func TestBitvector32_Count(t *testing.T) {
 			bitvector: Bitvector32{0x00}, // 0b11110000
 			want:      0,
 		},
+		{
+			bitvector: Bitvector32{0x00, 0x00, 0x00, 0x01, 0xFF},
+			want:      1,
+		},
 	}
 
 	for _, tt := range tests {
@@ -236,6 +240,10 @@ func TestBitvector32_Bytes(t *testing.T) {
 			bitvector: Bitvector32{0xF0},
 			want:      []byte{0xF0},
 		},
+		{
+			bitvector: Bitvector32{0x12, 0x34, 0xAB, 0x00, 0xF1},
+			want:      []byte{0x12, 0x34, 0xAB, 0x00},
+		},
 	}
 
 	for _, tt := range tests {
@@ -270,6 +278,14 @@ func TestBitVector32_BitIndices(t *testing.T) {
 		{
 			a:    Bitvector32{0b11111111, 0b11},
 			want: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+		},
+		{
+			a:    Bitvector32{0b0, 0b0, 0b0, 0b00000011},
+			want: []int{24, 25},
+		},
+		{
+			a:    Bitvector32{0b0, 0b0, 0b0, 0b00000011, 0b1},
+			want: []int{24, 25},
 		},
 	}
 
