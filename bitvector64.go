@@ -11,9 +11,12 @@ var _ = Bitfield(Bitvector64{})
 // present in the underlying byte array.
 type Bitvector64 []byte
 
+const bitvector64ByteSize = 8
+const bitvector64BitSize = bitvector64ByteSize * 8
+
 // NewBitvector64 creates a new bitvector of size 64.
 func NewBitvector64() Bitvector64 {
-	byteArray := [8]byte{}
+	byteArray := [bitvector64ByteSize]byte{}
 	return byteArray[:]
 }
 
@@ -48,7 +51,7 @@ func (b Bitvector64) SetBitAt(idx uint64, val bool) {
 
 // Len returns the number of bits in the bitvector.
 func (b Bitvector64) Len() uint64 {
-	return 64
+	return bitvector64BitSize
 }
 
 // Count returns the number of 1s in the bitvector.
@@ -57,20 +60,23 @@ func (b Bitvector64) Count() uint64 {
 		return 0
 	}
 	c := 0
-	for _, bt := range b {
+	for i, bt := range b {
+		if i >= bitvector64ByteSize {
+			break
+		}
 		c += bits.OnesCount8(bt)
 	}
 	return uint64(c)
 }
 
-// Bytes returns the bytes data representing the bitvector64. This method
-// bitmasks the underlying data to ensure that it is an accurate representation.
+// Bytes returns the bytes data representing the bitvector64.
 func (b Bitvector64) Bytes() []byte {
 	if len(b) == 0 {
 		return []byte{}
 	}
-	ret := make([]byte, len(b))
-	copy(ret, b[:])
+	ln := min(len(b), bitvector64ByteSize)
+	ret := make([]byte, ln)
+	copy(ret, b[:ln])
 	return ret[:]
 }
 
@@ -81,10 +87,10 @@ func (b Bitvector64) Shift(i int) {
 	}
 
 	// Shifting greater than 64 bits is pointless and can have unexpected behavior.
-	if i > 64 {
-		i = 64
-	} else if i < -64 {
-		i = -64
+	if i > bitvector64BitSize {
+		i = bitvector64BitSize
+	} else if i < -bitvector64BitSize {
+		i = -bitvector64BitSize
 	}
 	if i >= 0 {
 		num := binary.BigEndian.Uint64(b)
@@ -97,9 +103,13 @@ func (b Bitvector64) Shift(i int) {
 	}
 }
 
+// BitIndices returns the list of indices which are set to 1.
 func (b Bitvector64) BitIndices() []int {
-	indices := make([]int, 0, 64)
+	indices := make([]int, 0, bitvector64BitSize)
 	for i, bt := range b {
+		if i >= bitvector64ByteSize {
+			break
+		}
 		for j := 0; j < 8; j++ {
 			bit := byte(1 << uint(j))
 			if bt&bit == bit {

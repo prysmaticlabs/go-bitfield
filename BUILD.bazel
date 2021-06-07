@@ -59,6 +59,7 @@ go_library(
         "bitvector64.go",
         "bitvector8.go",
         "doc.go",
+        "min.go",
     ],
     importpath = "github.com/prysmaticlabs/go-bitfield",
     visibility = ["//visibility:public"],

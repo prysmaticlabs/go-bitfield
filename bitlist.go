@@ -281,6 +281,7 @@ func (b Bitlist) Not() Bitlist {
 	return ret
 }
 
+// BitIndices returns the list of indices that are set to 1.
 func (b Bitlist) BitIndices() []int {
 	indices := make([]int, 0, b.Count())
 	for i, bt := range b {

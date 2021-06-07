@@ -11,9 +11,12 @@ var _ = Bitfield(Bitvector1024{})
 // present in the underlying byte array.
 type Bitvector1024 []byte
 
+const bitvector1024ByteSize = 128
+const bitvector1024BitSize = bitvector1024ByteSize * 8
+
 // NewBitvector1024 creates a new bitvector of size 1024.
 func NewBitvector1024() Bitvector1024 {
-	byteArray := [128]byte{}
+	byteArray := [bitvector1024ByteSize]byte{}
 	return byteArray[:]
 }
 
@@ -48,7 +51,7 @@ func (b Bitvector1024) SetBitAt(idx uint64, val bool) {
 
 // Len returns the number of bits in the bitvector.
 func (b Bitvector1024) Len() uint64 {
-	return uint64(len(b) * 8)
+	return bitvector1024BitSize
 }
 
 // Count returns the number of 1s in the bitvector.
@@ -57,20 +60,23 @@ func (b Bitvector1024) Count() uint64 {
 		return 0
 	}
 	c := 0
-	for _, bt := range b {
+	for i, bt := range b {
+		if i >= bitvector1024ByteSize {
+			break
+		}
 		c += bits.OnesCount8(bt)
 	}
 	return uint64(c)
 }
 
-// Bytes returns the bytes data representing the Bitvector1024. This method
-// bitmasks the underlying data to ensure that it is an accurate representation.
+// Bytes returns the bytes data representing the Bitvector1024.
 func (b Bitvector1024) Bytes() []byte {
 	if len(b) == 0 {
 		return []byte{}
 	}
-	ret := make([]byte, len(b))
-	copy(ret, b[:])
+	ln := min(len(b), bitvector1024ByteSize)
+	ret := make([]byte, ln)
+	copy(ret, b[:ln])
 	return ret[:]
 }
 
@@ -81,10 +87,10 @@ func (b Bitvector1024) Shift(i int) {
 	}
 
 	// Shifting greater than 1024 bits is pointless and can have unexpected behavior.
-	if i > 1024 {
-		i = 1024
-	} else if i < -1024 {
-		i = -1024
+	if i > bitvector1024BitSize {
+		i = bitvector1024BitSize
+	} else if i < -bitvector1024BitSize {
+		i = -bitvector1024BitSize
 	}
 	if i >= 0 {
 		num := binary.BigEndian.Uint64(b)
@@ -99,8 +105,11 @@ func (b Bitvector1024) Shift(i int) {
 
 // BitIndices returns the list of indices that are set to 1.
 func (b Bitvector1024) BitIndices() []int {
-	indices := make([]int, 0, 1024)
+	indices := make([]int, 0, bitvector1024BitSize)
 	for i, bt := range b {
+		if i >= bitvector1024ByteSize {
+			break
+		}
 		for j := 0; j < 8; j++ {
 			bit := byte(1 << uint(j))
 			if bt&bit == bit {

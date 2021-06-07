@@ -251,6 +251,10 @@ func TestBitvector8_Bytes(t *testing.T) {
 			bitvector: Bitvector8{0xF0}, // 0b11110000
 			want:      []byte{0xF0},     // 0b11110000
 		},
+		{
+			bitvector: Bitvector8{0xF0, 0xFF}, // 0b11110000
+			want:      []byte{0xF0},     // 0b11110000
+		},
 	}
 
 	for _, tt := range tests {
@@ -284,6 +288,10 @@ func TestBitvector8_BitIndices(t *testing.T) {
 		},
 		{
 			a:    Bitvector8{0b11111111},
+			want: []int{0, 1, 2, 3, 4, 5, 6, 7},
+		},
+		{
+			a:    Bitvector8{0b11111111, 0xFF},
 			want: []int{0, 1, 2, 3, 4, 5, 6, 7},
 		},
 	}

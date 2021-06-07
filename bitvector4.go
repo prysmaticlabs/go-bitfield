@@ -10,6 +10,15 @@ var _ = Bitfield(Bitvector4{})
 // present in the underlying byte array.
 type Bitvector4 []byte
 
+const bitvector4ByteSize = 1
+const bitvector4BitSize = 4
+
+// NewBitvector4 creates a new bitvector of size 4.
+func NewBitvector4() Bitvector4 {
+	byteArray := [bitvector4ByteSize]byte{}
+	return byteArray[:]
+}
+
 // BitAt returns the bit value at the given index. If the index requested
 // exceeds the number of bits in the bitvector, then this method returns false.
 func (b Bitvector4) BitAt(idx uint64) bool {
@@ -42,7 +51,7 @@ func (b Bitvector4) SetBitAt(idx uint64, val bool) {
 
 // Len returns the number of bits in the bitvector.
 func (b Bitvector4) Len() uint64 {
-	return 4
+	return bitvector4BitSize
 }
 
 // Count returns the number of 1s in the bitvector.
@@ -83,6 +92,7 @@ func (b Bitvector4) Shift(i int) {
 	b[0] &= 0x0F
 }
 
+// BitIndices returns the list of indices that are set to 1.
 func (b Bitvector4) BitIndices() []int {
 	indices := make([]int, 0, 4)
 	for i, bt := range b {
