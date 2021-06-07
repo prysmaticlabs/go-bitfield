@@ -11,9 +11,12 @@ var _ = Bitfield(Bitvector512{})
 // present in the underlying byte array.
 type Bitvector512 []byte
 
-// NewBitvector512 creates a new bitvector of size 512.
+const bitvector512ByteSize = 64
+const bitvector512BitSize = bitvector512ByteSize * 8
+
+// NewBitvector512 creates a new bitvector of size 1024.
 func NewBitvector512() Bitvector512 {
-	byteArray := [64]byte{}
+	byteArray := [bitvector512ByteSize]byte{}
 	return byteArray[:]
 }
 
@@ -48,7 +51,7 @@ func (b Bitvector512) SetBitAt(idx uint64, val bool) {
 
 // Len returns the number of bits in the bitvector.
 func (b Bitvector512) Len() uint64 {
-	return 512
+	return bitvector512BitSize
 }
 
 // Count returns the number of 1s in the bitvector.
@@ -57,20 +60,23 @@ func (b Bitvector512) Count() uint64 {
 		return 0
 	}
 	c := 0
-	for _, bt := range b {
+	for i, bt := range b {
+		if i >= bitvector512ByteSize {
+			break
+		}
 		c += bits.OnesCount8(bt)
 	}
 	return uint64(c)
 }
 
-// Bytes returns the bytes data representing the Bitvector512. This method
-// bitmasks the underlying data to ensure that it is an accurate representation.
+// Bytes returns the bytes data representing the Bitvector512.
 func (b Bitvector512) Bytes() []byte {
 	if len(b) == 0 {
 		return []byte{}
 	}
-	ret := make([]byte, len(b))
-	copy(ret, b[:])
+	ln := min(len(b), bitvector512ByteSize)
+	ret := make([]byte, ln)
+	copy(ret, b[:ln])
 	return ret[:]
 }
 
@@ -79,12 +85,12 @@ func (b Bitvector512) Shift(i int) {
 	if len(b) == 0 {
 		return
 	}
-
-	// Shifting greater than 512 bits is pointless and can have unexpected behavior.
-	if i > 512 {
-		i = 512
-	} else if i < -512 {
-		i = -512
+	
+	// Shifting greater than 1024 bits is pointless and can have unexpected behavior.
+	if i > bitvector512BitSize {
+		i = bitvector512BitSize
+	} else if i < -bitvector512BitSize {
+		i = -bitvector512BitSize
 	}
 	if i >= 0 {
 		num := binary.BigEndian.Uint64(b)
@@ -99,8 +105,11 @@ func (b Bitvector512) Shift(i int) {
 
 // BitIndices returns the list of indices that are set to 1.
 func (b Bitvector512) BitIndices() []int {
-	indices := make([]int, 0, 512)
+	indices := make([]int, 0, bitvector512BitSize)
 	for i, bt := range b {
+		if i >= bitvector512ByteSize {
+			break
+		}
 		for j := 0; j < 8; j++ {
 			bit := byte(1 << uint(j))
 			if bt&bit == bit {
