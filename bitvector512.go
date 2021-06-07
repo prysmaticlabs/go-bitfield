@@ -14,7 +14,7 @@ type Bitvector512 []byte
 const bitvector512ByteSize = 64
 const bitvector512BitSize = bitvector512ByteSize * 8
 
-// NewBitvector512 creates a new bitvector of size 1024.
+// NewBitvector512 creates a new bitvector of size 512.
 func NewBitvector512() Bitvector512 {
 	byteArray := [bitvector512ByteSize]byte{}
 	return byteArray[:]
@@ -24,7 +24,7 @@ func NewBitvector512() Bitvector512 {
 // exceeds the number of bits in the bitvector, then this method returns false.
 func (b Bitvector512) BitAt(idx uint64) bool {
 	// Out of bounds, must be false.
-	if idx >= b.Len() || idx >= 512 {
+	if idx >= b.Len() {
 		return false
 	}
 
@@ -37,7 +37,7 @@ func (b Bitvector512) BitAt(idx uint64) bool {
 // false.
 func (b Bitvector512) SetBitAt(idx uint64, val bool) {
 	// Out of bounds, do nothing.
-	if idx >= b.Len() || idx >= 512 {
+	if idx >= b.Len() {
 		return
 	}
 
