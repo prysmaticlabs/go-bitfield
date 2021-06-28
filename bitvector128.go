@@ -139,3 +139,29 @@ func (b Bitvector128) Contains(c Bitvector128) bool {
 
 	return true
 }
+
+// Overlaps returns true if the bitlist contains one of the bits from the provided argument
+// bitlist. This method will panic if bitlists are not the same length.
+func (b Bitvector128) Overlaps(c Bitvector128) bool {
+	lenB, lenC := b.Len(), c.Len()
+	if lenB != lenC {
+		panic("bitlists are different lengths")
+	}
+
+	if lenB == 0 || lenC == 0 {
+		return false
+	}
+
+	// To ensure all of the bits in c are not overlapped in b, we iterate over every byte, invert b
+	// and xor the byte from b and c, then and it against c. If the result is non-zero, then
+	// we can be assured that byte in c had bits not overlapped in b.
+	for i := 0; i < len(b); i++ {
+		// If this byte is the last byte in the array, mask the length bit.
+		mask := uint8(0xFF)
+
+		if (^b[i]^c[i])&c[i]&mask != 0 {
+			return true
+		}
+	}
+	return false
+}

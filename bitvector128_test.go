@@ -449,3 +449,65 @@ func TestBitvector128_Contains(t *testing.T) {
 		}
 	}
 }
+
+func TestBitvector128_Overlaps(t *testing.T) {
+	tests := []struct {
+		a    Bitvector128
+		b    Bitvector128
+		want bool
+	}{
+		{
+			a:    Bitvector128{0x06}, // 0b00000110
+			b:    Bitvector128{0x01}, // 0b00000101
+			want: false,
+		},
+		{
+			a:    Bitvector128{0x06}, // 0b00000110
+			b:    Bitvector128{0x05}, // 0b00000101
+			want: true,
+		},
+		{
+			a:    Bitvector128{0x1A}, // 0b00011010
+			b:    Bitvector128{0x25}, // 0b00100101
+			want: false,
+		},
+		{
+			a:    Bitvector128{0x1F}, // 0b00011111
+			b:    Bitvector128{0x11}, // 0b00010001
+			want: true,
+		},
+		{
+			a:    Bitvector128{0xFF, 0x85}, // 0b11111111, 0b10000111
+			b:    Bitvector128{0x13, 0x8F}, // 0b00010011, 0b10001111
+			want: true,
+		},
+		{
+			a:    Bitvector128{0x00, 0x40}, // 0b00000001, 0b01000000
+			b:    Bitvector128{0x00, 0x40}, // 0b00000010, 0b01000000
+			want: true,
+		},
+		{
+			a:    Bitvector128{0x01, 0x40}, // 0b00000001, 0b01000000
+			b:    Bitvector128{0x02, 0x30}, // 0b00000010, 0b01000000
+			want: false,
+		},
+		{
+			a:    Bitvector128{0x01, 0x01, 0x01}, // 0b00000001, 0b00000001, 0b00000001
+			b:    Bitvector128{0x02, 0x00, 0x00}, // 0b00000010, 0b00000000, 0b00000001
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		result := tt.a.Overlaps(tt.b)
+		if result != tt.want {
+			t.Errorf(
+				"(%x).Overlaps(%x) = %t, wanted %t",
+				tt.a,
+				tt.b,
+				result,
+				tt.want,
+			)
+		}
+	}
+}
