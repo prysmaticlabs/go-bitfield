@@ -120,4 +120,3 @@ func (b Bitvector512) BitIndices() []int {
 
 	return indices
 }
-
