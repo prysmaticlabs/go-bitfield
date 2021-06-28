@@ -96,22 +96,3 @@ func (b Bitvector32) BitIndices() []int {
 
 	return indices
 }
-
-// Contains returns true if the bitlist contains all of the bits from the provided argument
-// bitlist. This method will panic if bitlists are not the same length.
-func (b Bitvector32) Contains(c Bitvector32) bool {
-	if b.Len() != c.Len() {
-		panic("bitvector are different lengths")
-	}
-
-	// To ensure all of the bits in c are present in b, we iterate over every byte, combine
-	// the byte from b and c, then XOR them against b. If the result of this is non-zero, then we
-	// are assured that a byte in c had bits not present in b.
-	for i := 0; i < len(b); i++ {
-		if b[i]^(b[i]|c[i]) != 0 {
-			return false
-		}
-	}
-
-	return true
-}
