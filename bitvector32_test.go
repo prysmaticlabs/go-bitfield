@@ -23,54 +23,54 @@ func TestBitvector32_Len(t *testing.T) {
 
 func TestBitvector32_BitAt(t *testing.T) {
 	tests := []struct {
-		bitlist Bitvector32
+		Bitvector32 Bitvector32
 		idx     uint64
 		want    bool
 	}{
 		{
-			bitlist: Bitvector32{0x01, 0x23, 0xE2, 0xFE, 0xDD, 0xAC, 0xAD},
+			Bitvector32: Bitvector32{0x01, 0x23, 0xE2, 0xFE, 0xDD, 0xAC, 0xAD},
 			idx:     70, // Out of bounds
 			want:    false,
 		},
 		{
-			bitlist: Bitvector32{0x01},
+			Bitvector32: Bitvector32{0x01},
 			idx:     0,
 			want:    true,
 		},
 		{
-			bitlist: Bitvector32{0x0E, 0xAA, 0x2F},
+			Bitvector32: Bitvector32{0x0E, 0xAA, 0x2F},
 			idx:     0,
 			want:    false,
 		},
 		{
-			bitlist: Bitvector32{0x01, 0x23, 0xE2, 0xFE}, // 00000001 00100011 11100010 11111110
+			Bitvector32: Bitvector32{0x01, 0x23, 0xE2, 0xFE}, // 00000001 00100011 11100010 11111110
 			idx:     35,
 			want:    false,
 		},
 		{
-			bitlist: Bitvector32{0x01, 0x23, 0xE2, 0xFE}, // 00000001 00100011 11100010 11111110
+			Bitvector32: Bitvector32{0x01, 0x23, 0xE2, 0xFE}, // 00000001 00100011 11100010 11111110
 			idx:     24,
 			want:    false,
 		},
 		{
-			bitlist: Bitvector32{0x0E}, // 0b00001110
+			Bitvector32: Bitvector32{0x0E}, // 0b00001110
 			idx:     3,                 //       ^
 			want:    true,
 		},
 		{
-			bitlist: Bitvector32{0x1E}, // 0b00011110
+			Bitvector32: Bitvector32{0x1E}, // 0b00011110
 			idx:     4,                 //      ^
 			want:    true,
 		},
 	}
 
 	for _, tt := range tests {
-		if tt.bitlist.BitAt(tt.idx) != tt.want {
+		if tt.Bitvector32.BitAt(tt.idx) != tt.want {
 			t.Errorf(
 				"(%x).BitAt(%d) = %t, wanted %t",
-				tt.bitlist,
+				tt.Bitvector32,
 				tt.idx,
-				tt.bitlist.BitAt(tt.idx),
+				tt.Bitvector32.BitAt(tt.idx),
 				tt.want,
 			)
 		}
@@ -301,3 +301,73 @@ func TestBitVector32_BitIndices(t *testing.T) {
 	}
 }
 
+func TestBitVector32_Contains(t *testing.T) {
+	tests := []struct {
+		a    Bitvector32
+		b    Bitvector32
+		want bool
+	}{
+		{
+			a:    Bitvector32{0x00, 0x00, 0x00, 0x02}, // 0b00000010
+			b:    Bitvector32{0x00, 0x00, 0x00, 0x03}, // 0b00000011
+			want: false,
+		},
+		{
+			a:    Bitvector32{0x00, 0x00, 0x00, 0x03}, // 0b00000011
+			b:    Bitvector32{0x00, 0x00, 0x00, 0x03}, // 0b00000011
+			want: true,
+		},
+		{
+			a:    Bitvector32{0x00, 0x00, 0x00, 0x13}, // 0b00010011
+			b:    Bitvector32{0x00, 0x00, 0x00, 0x15}, // 0b00010101
+			want: false,
+		},
+		{
+			a:    Bitvector32{0x00, 0x00, 0x00, 0x1F}, // 0b00011111
+			b:    Bitvector32{0x00, 0x00, 0x00, 0x13}, // 0b00010011
+			want: true,
+		},
+		{
+			a:    Bitvector32{0x00, 0x00, 0x00, 0x1F}, // 0b00011111
+			b:    Bitvector32{0x00, 0x00, 0x00, 0x13}, // 0b00010011
+			want: true,
+		},
+		{
+			a:    Bitvector32{0x00, 0x00, 0x1F, 0x03}, // 0b00011111, 0b00000011
+			b:    Bitvector32{0x00, 0x00, 0x13, 0x02}, // 0b00010011, 0b00000010
+			want: true,
+		},
+		{
+			a:    Bitvector32{0x00, 0x00, 0x1F, 0x01}, // 0b00011111, 0b00000001
+			b:    Bitvector32{0x00, 0x00, 0x93, 0x01}, // 0b10010011, 0b00000001
+			want: false,
+		},
+		{
+			a:    Bitvector32{0x00, 0x00, 0xFF, 0x02}, // 0b11111111, 0x00000010
+			b:    Bitvector32{0x00, 0x00, 0x13, 0x03}, // 0b00010011, 0x00000011
+			want: false,
+		},
+		{
+			a:    Bitvector32{0x00, 0x00, 0xFF, 0x85}, // 0b11111111, 0x10000111
+			b:    Bitvector32{0x00, 0x00, 0x13, 0x8F}, // 0b00010011, 0x10001111
+			want: false,
+		},
+		{
+			a:    Bitvector32{0x00, 0x00, 0xFF, 0x8F}, // 0b11111111, 0x10001111
+			b:    Bitvector32{0x00, 0x00, 0x13, 0x83}, // 0b00010011, 0x10000011
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		if tt.a.Contains(tt.b) != tt.want {
+			t.Errorf(
+				"(%x).Contains(%x) = %t, wanted %t",
+				tt.a,
+				tt.b,
+				tt.a.Contains(tt.b),
+				tt.want,
+			)
+		}
+	}
+}
