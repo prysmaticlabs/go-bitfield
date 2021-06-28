@@ -167,7 +167,7 @@ func (b Bitvector128) Overlaps(c Bitvector128) bool {
 }
 
 // Or returns the OR result of the two bitfields. This method will panic if the bitlists are not the same length.
-func (b Bitvector128) Or(c Bitvector128) Bitlist {
+func (b Bitvector128) Or(c Bitvector128) Bitvector128 {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
