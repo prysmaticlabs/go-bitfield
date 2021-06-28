@@ -511,3 +511,64 @@ func TestBitvector128_Overlaps(t *testing.T) {
 		}
 	}
 }
+
+func TestBitVector128_Or(t *testing.T) {
+	tests := []struct {
+		a    Bitvector128
+		b    Bitvector128
+		want Bitvector128
+	}{
+		{
+			a:    Bitvector128{0x02}, // 0b00000010
+			b:    Bitvector128{0x03}, // 0b00000011
+			want: Bitvector128{0x03}, // 0b00000011
+		},
+		{
+			a:    Bitvector128{0x03}, // 0b00000011
+			b:    Bitvector128{0x03}, // 0b00000011
+			want: Bitvector128{0x03}, // 0b00000011
+		},
+		{
+			a:    Bitvector128{0x13}, // 0b00010011
+			b:    Bitvector128{0x15}, // 0b00010101
+			want: Bitvector128{0x17}, // 0b00010111
+		},
+		{
+			a:    Bitvector128{0x1F}, // 0b00011111
+			b:    Bitvector128{0x13}, // 0b00010011
+			want: Bitvector128{0x1F}, // 0b00011111
+		},
+		{
+			a:    Bitvector128{0x1F, 0x03}, // 0b00011111, 0b00000011
+			b:    Bitvector128{0x13, 0x02}, // 0b00010011, 0b00000010
+			want: Bitvector128{0x1F, 0x03}, // 0b00011111, 0b00000011
+		},
+		{
+			a:    Bitvector128{0x1F, 0x01}, // 0b00011111, 0b00000001
+			b:    Bitvector128{0x93, 0x01}, // 0b10010011, 0b00000001
+			want: Bitvector128{0x9F, 0x01}, // 0b00011111, 0b00000001
+		},
+		{
+			a:    Bitvector128{0xFF, 0x02}, // 0b11111111, 0x00000010
+			b:    Bitvector128{0x13, 0x03}, // 0b00010011, 0x00000011
+			want: Bitvector128{0xFF, 0x03}, // 0b11111111, 0x00000011
+		},
+		{
+			a:    Bitvector128{0xFF, 0x85}, // 0b11111111, 0x10000111
+			b:    Bitvector128{0x13, 0x8F}, // 0b00010011, 0x10001111
+			want: Bitvector128{0xFF, 0x8F}, // 0b11111111, 0x10001111
+		},
+	}
+
+	for _, tt := range tests {
+		if !bytes.Equal(tt.a.Or(tt.b), tt.want) {
+			t.Errorf(
+				"(%x).Or(%x) = %x, wanted %x",
+				tt.a,
+				tt.b,
+				tt.a.Or(tt.b),
+				tt.want,
+			)
+		}
+	}
+}
