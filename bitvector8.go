@@ -129,11 +129,7 @@ func (b Bitvector8) Overlaps(c Bitvector8) bool {
 	// Invert b and xor the byte from b and c, then and it against c. If the result is non-zero, then
 	// we can be assured that byte in c had bits not overlapped in b.
 	mask := uint8(0xFF)
-	if (^b[0]^c[0])&c[0]&mask != 0 {
-		return true
-	}
-
-	return false
+	return (^b[0]^c[0])&c[0]&mask != 0
 }
 
 // Or returns the OR result of the two bitfields. This method will panic if the bitlists are not the same length.
