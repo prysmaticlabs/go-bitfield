@@ -137,8 +137,5 @@ func (b Bitvector8) Or(c Bitvector8) Bitvector8 {
 		panic("bitvector size is not bitvector8BitSize")
 	}
 
-	ret := make([]byte, len(b))
-	ret[0] = b[0] | c[0]
-
-	return ret
+	return []byte{b[0] | c[0]}
 }
