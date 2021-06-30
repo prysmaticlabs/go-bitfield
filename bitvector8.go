@@ -118,10 +118,6 @@ func (b Bitvector8) Overlaps(c Bitvector8) bool {
 		panic("bitvector size is not bitvector8BitSize")
 	}
 
-	if lenB == 0 || lenC == 0 {
-		return false
-	}
-
 	// Invert b and xor the byte from b and c, then and it against c. If the result is non-zero, then
 	// we can be assured that byte in c had bits not overlapped in b.
 	mask := uint8(0xFF)
