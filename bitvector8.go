@@ -104,7 +104,7 @@ func (b Bitvector8) Contains(c Bitvector8) bool {
 
 	// Combine the byte from b and c, then XOR them against b. If the result of this is non-zero, then we
 	// are assured that a byte in c had bits not present in b.
-	return b[0]^(b[0]|c[0]) != 0
+	return b[0]^(b[0]|c[0]) == 0
 }
 
 // Overlaps returns true if the bitlist contains one of the bits from the provided argument
