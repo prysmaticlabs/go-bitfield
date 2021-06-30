@@ -93,20 +93,21 @@ func (b Bitvector8) BitIndices() []int {
 }
 
 // Contains returns true if the bitlist contains all of the bits from the provided argument
-// bitlist. This method will panic if bitlists are not the same length.
+// bitlist. This method will panic if bitlists are not the same length or not `bitvector8BitSize`.
 func (b Bitvector8) Contains(c Bitvector8) bool {
 	if b.Len() != c.Len() {
 		panic("bitvector are different lengths")
 	}
+	if b.Len() != bitvector8BitSize {
+		panic("bitvector size is not bitvector8BitSize")
+	}
 
-	// To ensure all of the bits in c are present in b, we iterate over every byte, combine
-	// the byte from b and c, then XOR them against b. If the result of this is non-zero, then we
+	// Combine the byte from b and c, then XOR them against b. If the result of this is non-zero, then we
 	// are assured that a byte in c had bits not present in b.
-	for i := 0; i < len(b); i++ {
-		if b[i]^(b[i]|c[i]) != 0 {
+		if b[0]^(b[0]|c[0]) != 0 {
 			return false
 		}
-	}
+
 
 	return true
 }
@@ -118,22 +119,21 @@ func (b Bitvector8) Overlaps(c Bitvector8) bool {
 	if lenB != lenC {
 		panic("bitlists are different lengths")
 	}
+	if lenB != bitvector8BitSize {
+		panic("bitvector size is not bitvector8BitSize")
+	}
 
 	if lenB == 0 || lenC == 0 {
 		return false
 	}
 
-	// To ensure all of the bits in c are not overlapped in b, we iterate over every byte, invert b
-	// and xor the byte from b and c, then and it against c. If the result is non-zero, then
+	// Invert b and xor the byte from b and c, then and it against c. If the result is non-zero, then
 	// we can be assured that byte in c had bits not overlapped in b.
-	for i := 0; i < len(b); i++ {
-		// If this byte is the last byte in the array, mask the length bit.
 		mask := uint8(0xFF)
-
-		if (^b[i]^c[i])&c[i]&mask != 0 {
+		if (^b[0]^c[0])&c[0]&mask != 0 {
 			return true
 		}
-	}
+
 	return false
 }
 
@@ -142,11 +142,12 @@ func (b Bitvector8) Or(c Bitvector8) Bitvector8 {
 	if b.Len() != c.Len() {
 		panic("bitlists are different lengths")
 	}
+	if b.Len() != bitvector8BitSize {
+		panic("bitvector size is not bitvector8BitSize")
+	}
 
 	ret := make([]byte, len(b))
-	for i := 0; i < len(b); i++ {
-		ret[i] = b[i] | c[i]
-	}
+	ret[0] = b[0] | c[0]
 
 	return ret
 }
