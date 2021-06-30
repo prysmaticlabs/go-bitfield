@@ -307,3 +307,127 @@ func TestBitvector8_BitIndices(t *testing.T) {
 		}
 	}
 }
+
+func TestBitvector8_Contains(t *testing.T) {
+	tests := []struct {
+		a    Bitvector8
+		b    Bitvector8
+		want bool
+	}{
+		{
+			a:    Bitvector8{0x02}, // 0b00000010
+			b:    Bitvector8{0x03}, // 0b00000011
+			want: false,
+		},
+		{
+			a:    Bitvector8{0x03}, // 0b00000011
+			b:    Bitvector8{0x03}, // 0b00000011
+			want: true,
+		},
+		{
+			a:    Bitvector8{0x13}, // 0b00010011
+			b:    Bitvector8{0x15}, // 0b00010101
+			want: false,
+		},
+		{
+			a:    Bitvector8{0x1F}, // 0b00011111
+			b:    Bitvector8{0x13}, // 0b00010011
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		if tt.a.Contains(tt.b) != tt.want {
+			t.Errorf(
+				"(%x).Contains(%x) = %t, wanted %t",
+				tt.a,
+				tt.b,
+				tt.a.Contains(tt.b),
+				tt.want,
+			)
+		}
+	}
+}
+
+func TestBitvector8_Overlaps(t *testing.T) {
+	tests := []struct {
+		a    Bitvector8
+		b    Bitvector8
+		want bool
+	}{
+		{
+			a:    Bitvector8{0x06}, // 0b00000110
+			b:    Bitvector8{0x01}, // 0b00000101
+			want: false,
+		},
+		{
+			a:    Bitvector8{0x06}, // 0b00000110
+			b:    Bitvector8{0x05}, // 0b00000101
+			want: true,
+		},
+		{
+			a:    Bitvector8{0x1A}, // 0b00011010
+			b:    Bitvector8{0x25}, // 0b00100101
+			want: false,
+		},
+		{
+			a:    Bitvector8{0x1F}, // 0b00011111
+			b:    Bitvector8{0x11}, // 0b00010001
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		result := tt.a.Overlaps(tt.b)
+		if result != tt.want {
+			t.Errorf(
+				"(%x).Overlaps(%x) = %t, wanted %t",
+				tt.a,
+				tt.b,
+				result,
+				tt.want,
+			)
+		}
+	}
+}
+
+func TestBitVector8_Or(t *testing.T) {
+	tests := []struct {
+		a    Bitvector8
+		b    Bitvector8
+		want Bitvector8
+	}{
+		{
+			a:    Bitvector8{0x02}, // 0b00000010
+			b:    Bitvector8{0x03}, // 0b00000011
+			want: Bitvector8{0x03}, // 0b00000011
+		},
+		{
+			a:    Bitvector8{0x03}, // 0b00000011
+			b:    Bitvector8{0x03}, // 0b00000011
+			want: Bitvector8{0x03}, // 0b00000011
+		},
+		{
+			a:    Bitvector8{0x13}, // 0b00010011
+			b:    Bitvector8{0x15}, // 0b00010101
+			want: Bitvector8{0x17}, // 0b00010111
+		},
+		{
+			a:    Bitvector8{0x1F}, // 0b00011111
+			b:    Bitvector8{0x13}, // 0b00010011
+			want: Bitvector8{0x1F}, // 0b00011111
+		},
+	}
+
+	for _, tt := range tests {
+		if !bytes.Equal(tt.a.Or(tt.b), tt.want) {
+			t.Errorf(
+				"(%x).Or(%x) = %x, wanted %x",
+				tt.a,
+				tt.b,
+				tt.a.Or(tt.b),
+				tt.want,
+			)
+		}
+	}
+}
