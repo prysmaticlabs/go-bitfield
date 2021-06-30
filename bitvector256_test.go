@@ -116,13 +116,13 @@ func TestBitvector256_SetBitAt(t *testing.T) {
 	}{
 		{
 			bitvector: Bitvector256{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00000001
-			idx:       0,                                                             //          ^
+			idx:       0,                                                            //          ^
 			val:       true,
 			want:      Bitvector256{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00000001
 		},
 		{
 			bitvector: Bitvector256{0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00000010
-			idx:       0,                                                             //          ^
+			idx:       0,                                                            //          ^
 			val:       true,
 			want:      Bitvector256{0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00000011
 		},
@@ -134,13 +134,13 @@ func TestBitvector256_SetBitAt(t *testing.T) {
 		},
 		{
 			bitvector: Bitvector256{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00000000
-			idx:       48,                                                            //       ^
+			idx:       48,                                                           //       ^
 			val:       true,
 			want:      Bitvector256{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00}, // 0b00001000
 		},
 		{
 			bitvector: Bitvector256{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00000000
-			idx:       30,                                                            //      ^
+			idx:       30,                                                           //      ^
 			val:       true,
 			want:      Bitvector256{0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00}, // 0b00001000
 		},
@@ -152,13 +152,13 @@ func TestBitvector256_SetBitAt(t *testing.T) {
 		},
 		{
 			bitvector: Bitvector256{0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00001111
-			idx:       0,                                                             //          ^
+			idx:       0,                                                            //          ^
 			val:       true,
 			want:      Bitvector256{0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00001111
 		},
 		{
 			bitvector: Bitvector256{0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00001111
-			idx:       0,                                                             //          ^
+			idx:       0,                                                            //          ^
 			val:       false,
 			want:      Bitvector256{0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00001110
 		},

@@ -104,10 +104,9 @@ func (b Bitvector8) Contains(c Bitvector8) bool {
 
 	// Combine the byte from b and c, then XOR them against b. If the result of this is non-zero, then we
 	// are assured that a byte in c had bits not present in b.
-		if b[0]^(b[0]|c[0]) != 0 {
-			return false
-		}
-
+	if b[0]^(b[0]|c[0]) != 0 {
+		return false
+	}
 
 	return true
 }
@@ -129,10 +128,10 @@ func (b Bitvector8) Overlaps(c Bitvector8) bool {
 
 	// Invert b and xor the byte from b and c, then and it against c. If the result is non-zero, then
 	// we can be assured that byte in c had bits not overlapped in b.
-		mask := uint8(0xFF)
-		if (^b[0]^c[0])&c[0]&mask != 0 {
-			return true
-		}
+	mask := uint8(0xFF)
+	if (^b[0]^c[0])&c[0]&mask != 0 {
+		return true
+	}
 
 	return false
 }

@@ -85,7 +85,7 @@ func (b Bitvector512) Shift(i int) {
 	if len(b) == 0 {
 		return
 	}
-	
+
 	// Shifting greater than 1024 bits is pointless and can have unexpected behavior.
 	if i > bitvector512BitSize {
 		i = bitvector512BitSize

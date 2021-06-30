@@ -253,7 +253,7 @@ func TestBitvector8_Bytes(t *testing.T) {
 		},
 		{
 			bitvector: Bitvector8{0xF0, 0xFF}, // 0b11110000
-			want:      []byte{0xF0},     // 0b11110000
+			want:      []byte{0xF0},           // 0b11110000
 		},
 	}
 
