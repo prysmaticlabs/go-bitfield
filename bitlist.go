@@ -135,7 +135,7 @@ func (b Bitlist) BytesNoTrim() []byte {
 }
 
 // ToBitlist64 converts []byte backed bitlist into []uint64 backed bitlist.
-func (b Bitlist) ToBitlist64() *Bitlist64 {
+func (b Bitlist) ToBitlist64() (*Bitlist64, error) {
 	return NewBitlist64FromBytes(b.Len(), b.BytesNoTrim())
 }
 
@@ -155,10 +155,10 @@ func (b Bitlist) Count() uint64 {
 }
 
 // Contains returns true if the bitlist contains all of the bits from the provided argument
-// bitlist. This method will panic if bitlists are not the same length.
-func (b Bitlist) Contains(c Bitlist) bool {
+// bitlist. This method will return an error if bitlists are not the same length.
+func (b Bitlist) Contains(c Bitlist) (bool, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return false, ErrBitlistDifferentLength
 	}
 
 	// To ensure all of the bits in c are present in b, we iterate over every byte, combine
@@ -166,23 +166,23 @@ func (b Bitlist) Contains(c Bitlist) bool {
 	// are assured that a byte in c had bits not present in b.
 	for i := 0; i < len(b); i++ {
 		if b[i]^(b[i]|c[i]) != 0 {
-			return false
+			return false, nil
 		}
 	}
 
-	return true
+	return true, nil
 }
 
 // Overlaps returns true if the bitlist contains one of the bits from the provided argument
-// bitlist. This method will panic if bitlists are not the same length.
-func (b Bitlist) Overlaps(c Bitlist) bool {
+// bitlist. This method will return an error if bitlists are not the same length.
+func (b Bitlist) Overlaps(c Bitlist) (bool, error) {
 	lenB, lenC := b.Len(), c.Len()
 	if lenB != lenC {
-		panic("bitlists are different lengths")
+		return false, ErrBitlistDifferentLength
 	}
 
 	if lenB == 0 || lenC == 0 {
-		return false
+		return false, nil
 	}
 
 	msb := uint8(bits.Len8(b[len(b)-1])) - 1
@@ -199,16 +199,16 @@ func (b Bitlist) Overlaps(c Bitlist) bool {
 		}
 
 		if (^b[i]^c[i])&c[i]&mask != 0 {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
-// Or returns the OR result of the two bitfields. This method will panic if the bitlists are not the same length.
-func (b Bitlist) Or(c Bitlist) Bitlist {
+// Or returns the OR result of the two bitfields. This method will return an error if the bitlists are not the same length.
+func (b Bitlist) Or(c Bitlist) (Bitlist, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return nil, ErrBitlistDifferentLength
 	}
 
 	ret := make([]byte, len(b))
@@ -216,13 +216,13 @@ func (b Bitlist) Or(c Bitlist) Bitlist {
 		ret[i] = b[i] | c[i]
 	}
 
-	return ret
+	return ret, nil
 }
 
-// And returns the AND result of the two bitfields. This method will panic if the bitlists are not the same length.
-func (b Bitlist) And(c Bitlist) Bitlist {
+// And returns the AND result of the two bitfields. This method will return an error if the bitlists are not the same length.
+func (b Bitlist) And(c Bitlist) (Bitlist, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return nil, ErrBitlistDifferentLength
 	}
 
 	ret := make([]byte, len(b))
@@ -230,13 +230,13 @@ func (b Bitlist) And(c Bitlist) Bitlist {
 		ret[i] = b[i] & c[i]
 	}
 
-	return ret
+	return ret, nil
 }
 
-// Xor returns the XOR result of the two bitfields. This method will panic if the bitlists are not the same length.
-func (b Bitlist) Xor(c Bitlist) Bitlist {
+// Xor returns the XOR result of the two bitfields. This method will return an error if the bitlists are not the same length.
+func (b Bitlist) Xor(c Bitlist) (Bitlist, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return nil, ErrBitlistDifferentLength
 	}
 
 	// Process all bytes but the last.
@@ -254,7 +254,7 @@ func (b Bitlist) Xor(c Bitlist) Bitlist {
 		ret[len(b)-1] |= uint8(1 << msb)
 	}
 
-	return ret
+	return ret, nil
 }
 
 // Not returns the NOT result of the bitfield.

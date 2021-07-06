@@ -294,7 +294,10 @@ func TestBitlist64_NewBitlist64FromBytes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("NewBitlist64FromBytes(%d, %#x)", tt.size, tt.from), func(t *testing.T) {
-			got := NewBitlist64FromBytes(tt.size, tt.from)
+			got, err := NewBitlist64FromBytes(tt.size, tt.from)
+			if err != nil {
+				t.Error(err)
+			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewBitlist64FromBytes(%d, %#x) = %+v, wanted %+v", tt.size, tt.from, got, tt.want)
 			}
@@ -381,7 +384,10 @@ func TestBitlist64_ToBitlist(t *testing.T) {
 			}
 
 			// Now convert back, and compare to the original.
-			gotSource := got.ToBitlist64()
+			gotSource, err := got.ToBitlist64()
+			if err != nil {
+				t.Error(err)
+			}
 			if !reflect.DeepEqual(gotSource, source) {
 				t.Errorf("ToBitlist(%#x).ToBitlist64() = %+v, wanted %+v", source, gotSource, source)
 			}
@@ -860,20 +866,17 @@ func TestBitlist64_Contains(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if tt.a.Contains(tt.b) != tt.want {
-			t.Errorf("(%+v).Contains(%+v) = %t, wanted %t", tt.a, tt.b, tt.a.Contains(tt.b), tt.want)
+		if got, err := tt.a.Contains(tt.b); got != tt.want || err != nil {
+			t.Errorf("(%+v).Contains(%+v) = %t, %t, wanted %t", tt.a, tt.b, got, err, tt.want)
 		}
 	}
 
-	t.Run("check panics", func(t *testing.T) {
-		defer func() {
-			if r := recover(); r == nil {
-				t.Error("Expected panic not thrown")
-			}
-		}()
+	t.Run("check errors", func(t *testing.T) {
 		a := NewBitlist64(64)
 		b := NewBitlist64(128)
-		a.Contains(b)
+		if _, err := a.Contains(b); err == nil {
+			t.Error("No error returned")
+		}
 	})
 }
 
@@ -987,22 +990,22 @@ func TestBitlist64_Overlaps(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("bitlist:%+v,%+v", tt.a, tt.b), func(t *testing.T) {
-			result := tt.a.Overlaps(tt.b)
+			result, err := tt.a.Overlaps(tt.b)
+			if err != nil {
+				t.Error(err)
+			}
 			if result != tt.want {
 				t.Errorf("(%+v).Overlaps(%+v) = %t, wanted %t", tt.a, tt.b, result, tt.want)
 			}
 		})
 	}
 
-	t.Run("check panics", func(t *testing.T) {
-		defer func() {
-			if r := recover(); r == nil {
-				t.Error("Expected panic not thrown")
-			}
-		}()
+	t.Run("check errors", func(t *testing.T) {
 		a := NewBitlist64(64)
 		b := NewBitlist64(128)
-		a.Overlaps(b)
+		if _, err := a.Overlaps(b); err != ErrBitlistDifferentLength {
+			t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+		}
 	})
 }
 
@@ -1056,8 +1059,12 @@ func TestBitlist64_Or(t *testing.T) {
 
 	t.Run("Or()", func(t *testing.T) {
 		for _, tt := range tests {
-			if !reflect.DeepEqual(tt.a.Or(tt.b).data, tt.want.data) {
-				t.Errorf("(%+v).Or(%+v) = %+v, wanted %x", tt.a, tt.b, tt.a.Or(tt.b), tt.want)
+			got, err := tt.a.Or(tt.b)
+			if err != nil {
+				t.Error(err)
+			}
+			if !reflect.DeepEqual(got.data, tt.want.data) {
+				t.Errorf("(%+v).Or(%+v) = %+v, wanted %x", tt.a, tt.b, got, tt.want)
 			}
 		}
 	})
@@ -1077,53 +1084,41 @@ func TestBitlist64_Or(t *testing.T) {
 	})
 	t.Run("OrCount()", func(t *testing.T) {
 		for _, tt := range tests {
-			if tt.a.OrCount(tt.b) != tt.want.Count() {
-				t.Errorf("(%+v).OrCount(%+v) = %d, wanted %d", tt.a, tt.b, tt.a.OrCount(tt.b), tt.want.Count())
+			if got, err := tt.a.OrCount(tt.b); got != tt.want.Count() || err != nil {
+				t.Errorf("(%+v).OrCount(%+v) = %d, %v, wanted %d", tt.a, tt.b, got, err, tt.want.Count())
 			}
 		}
 	})
-	t.Run("check panics", func(t *testing.T) {
+	t.Run("check errors", func(t *testing.T) {
 		t.Run("Or()", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(128)
-			a.Or(b)
+			if _, err := a.Or(b); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 		t.Run("NoAllocOr()", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(128)
 			ret := NewBitlist64(64)
-			a.NoAllocOr(b, ret)
+			if err := a.NoAllocOr(b, ret); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 		t.Run("NoAllocOr() wrong length of result param", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(64)
 			ret := NewBitlist64(128)
-			a.NoAllocOr(b, ret)
+			if err := a.NoAllocOr(b, ret); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 		t.Run("OrCount()", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(128)
-			a.OrCount(b)
+			if _, err := a.OrCount(b); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 	})
 }
@@ -1178,8 +1173,12 @@ func TestBitlist64_And(t *testing.T) {
 
 	t.Run("And()", func(t *testing.T) {
 		for _, tt := range tests {
-			if !reflect.DeepEqual(tt.a.And(tt.b).data, tt.want.data) {
-				t.Errorf("(%+v).And(%+v) = %+v, wanted %x", tt.a, tt.b, tt.a.And(tt.b), tt.want)
+			got, err := tt.a.And(tt.b)
+			if err != nil {
+				t.Error(err)
+			}
+			if !reflect.DeepEqual(got.data, tt.want.data) {
+				t.Errorf("(%+v).And(%+v) = %+v, %v, wanted %x", tt.a, tt.b, got, err, tt.want)
 			}
 		}
 	})
@@ -1199,53 +1198,42 @@ func TestBitlist64_And(t *testing.T) {
 	})
 	t.Run("AndCount()", func(t *testing.T) {
 		for _, tt := range tests {
-			if tt.a.AndCount(tt.b) != tt.want.Count() {
-				t.Errorf("(%+v).AndCount(%+v) = %d, wanted %d", tt.a, tt.b, tt.a.AndCount(tt.b), tt.want.Count())
+			if got, err := tt.a.AndCount(tt.b); got != tt.want.Count() || err != nil {
+				t.Errorf("(%+v).AndCount(%+v) = %d, %v, wanted %d", tt.a, tt.b, got, err, tt.want.Count())
 			}
 		}
 	})
-	t.Run("check panics", func(t *testing.T) {
+	t.Run("check errors", func(t *testing.T) {
 		t.Run("And()", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
+
 			a := NewBitlist64(64)
 			b := NewBitlist64(128)
-			a.And(b)
+			if _, err := a.And(b); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 		t.Run("NoAllocAnd()", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(128)
 			ret := NewBitlist64(64)
-			a.NoAllocAnd(b, ret)
+			if err := a.NoAllocAnd(b, ret); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 		t.Run("NoAllocAnd() wrong length of result param", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(64)
 			ret := NewBitlist64(128)
-			a.NoAllocAnd(b, ret)
+			if err := a.NoAllocAnd(b, ret); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 		t.Run("AndCount()", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(128)
-			a.AndCount(b)
+			if _, err := a.AndCount(b); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 	})
 }
@@ -1305,8 +1293,12 @@ func TestBitlist64_Xor(t *testing.T) {
 
 	t.Run("Xor()", func(t *testing.T) {
 		for _, tt := range tests {
-			if !reflect.DeepEqual(tt.a.Xor(tt.b).data, tt.want.data) {
-				t.Errorf("(%+v).Xor(%+v) = %+v, wanted %x", tt.a, tt.b, tt.a.Xor(tt.b), tt.want)
+			got, err := tt.a.Xor(tt.b)
+			if err != nil {
+				t.Error(err)
+			}
+			if !reflect.DeepEqual(got.data, tt.want.data) {
+				t.Errorf("(%+v).Xor(%+v) = %+v, wanted %x", tt.a, tt.b, got, tt.want)
 			}
 		}
 	})
@@ -1326,53 +1318,41 @@ func TestBitlist64_Xor(t *testing.T) {
 	})
 	t.Run("XorCount()", func(t *testing.T) {
 		for _, tt := range tests {
-			if tt.a.XorCount(tt.b) != tt.want.Count() {
-				t.Errorf("(%+v).XorCount(%+v) = %d, wanted %d", tt.a, tt.b, tt.a.XorCount(tt.b), tt.want.Count())
+			if got, err := tt.a.XorCount(tt.b); got != tt.want.Count() || err != nil {
+				t.Errorf("(%+v).XorCount(%+v) = %d, %v, wanted %d", tt.a, tt.b, got, err, tt.want.Count())
 			}
 		}
 	})
-	t.Run("check panics", func(t *testing.T) {
+	t.Run("check errors", func(t *testing.T) {
 		t.Run("Xor()", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(128)
-			a.Xor(b)
+			if _, err := a.Xor(b); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 		t.Run("NoAllocXor()", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(128)
 			ret := NewBitlist64(64)
-			a.NoAllocXor(b, ret)
+			if err := a.NoAllocXor(b, ret); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 		t.Run("NoAllocXor() wrong length of result param", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(64)
 			ret := NewBitlist64(128)
-			a.NoAllocXor(b, ret)
+			if err := a.NoAllocXor(b, ret); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 		t.Run("XorCount()", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Error("Expected panic not thrown")
-				}
-			}()
 			a := NewBitlist64(64)
 			b := NewBitlist64(128)
-			a.XorCount(b)
+			if _, err := a.XorCount(b); err != ErrBitlistDifferentLength {
+				t.Errorf("Wrong error returned. Wanted %v, got %v", ErrBitlistDifferentLength, err)
+			}
 		})
 	})
 }

@@ -122,10 +122,10 @@ func (b Bitvector128) BitIndices() []int {
 }
 
 // Contains returns true if the bitlist contains all of the bits from the provided argument
-// bitlist. This method will panic if bitlists are not the same length.
-func (b Bitvector128) Contains(c Bitvector128) bool {
+// bitlist. This method will return an error if bitlists are not the same length.
+func (b Bitvector128) Contains(c Bitvector128) (bool, error) {
 	if b.Len() != c.Len() {
-		panic("bitvector are different lengths")
+		return false, ErrBitvectorDifferentLength
 	}
 
 	// To ensure all of the bits in c are present in b, we iterate over every byte, combine
@@ -133,23 +133,23 @@ func (b Bitvector128) Contains(c Bitvector128) bool {
 	// are assured that a byte in c had bits not present in b.
 	for i := 0; i < len(b); i++ {
 		if b[i]^(b[i]|c[i]) != 0 {
-			return false
+			return false, nil
 		}
 	}
 
-	return true
+	return true, nil
 }
 
 // Overlaps returns true if the bitlist contains one of the bits from the provided argument
-// bitlist. This method will panic if bitlists are not the same length.
-func (b Bitvector128) Overlaps(c Bitvector128) bool {
+// bitlist. This method will return an error if bitlists are not the same length.
+func (b Bitvector128) Overlaps(c Bitvector128) (bool, error) {
 	lenB, lenC := b.Len(), c.Len()
-	if lenB != lenC {
-		panic("bitlists are different lengths")
+	if b.Len() != c.Len() {
+		return false, ErrBitvectorDifferentLength
 	}
 
 	if lenB == 0 || lenC == 0 {
-		return false
+		return false, nil
 	}
 
 	// To ensure all of the bits in c are not overlapped in b, we iterate over every byte, invert b
@@ -160,16 +160,16 @@ func (b Bitvector128) Overlaps(c Bitvector128) bool {
 		mask := uint8(0xFF)
 
 		if (^b[i]^c[i])&c[i]&mask != 0 {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
-// Or returns the OR result of the two bitfields. This method will panic if the bitlists are not the same length.
-func (b Bitvector128) Or(c Bitvector128) Bitvector128 {
+// Or returns the OR result of the two bitfields. This method will return an error if the bitlists are not the same length.
+func (b Bitvector128) Or(c Bitvector128) (Bitvector128, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return nil, ErrBitvectorDifferentLength
 	}
 
 	ret := make([]byte, len(b))
@@ -177,5 +177,5 @@ func (b Bitvector128) Or(c Bitvector128) Bitvector128 {
 		ret[i] = b[i] | c[i]
 	}
 
-	return ret
+	return ret, nil
 }

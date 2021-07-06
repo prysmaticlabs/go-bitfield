@@ -47,9 +47,9 @@ func NewBitlist64From(data []uint64) *Bitlist64 {
 // NewBitlist64FromBytes creates a new bitlist for a given array of bytes.
 // Size of the bitlist is explicitly specified via `n` (since number of bits required may not align
 // perfectly to the word size).
-func NewBitlist64FromBytes(n uint64, b []byte) *Bitlist64 {
+func NewBitlist64FromBytes(n uint64, b []byte) (*Bitlist64, error) {
 	if n > uint64(len(b)<<3) {
-		panic(fmt.Sprintf("an array of %d bytes is not enough to hold n=%d bits.", len(b), n))
+		return nil, fmt.Errorf("an array of %d bytes is not enough to hold n=%d bits", len(b), n)
 	}
 	// Extend input slice with zero bytes if it isn't evenly divisible by word size.
 	if numExtraBytes := len(b) % bytesInWord; numExtraBytes != 0 {
@@ -65,7 +65,7 @@ func NewBitlist64FromBytes(n uint64, b []byte) *Bitlist64 {
 	return &Bitlist64{
 		size: n,
 		data: data,
-	}
+	}, nil
 }
 
 // BitAt returns the bit value at the given index. If the index requested
@@ -174,10 +174,10 @@ func (b *Bitlist64) Count() uint64 {
 
 // Contains returns true if the bitlist contains all of the bits from the provided argument
 // bitlist i.e. if `b` is a superset of `c`.
-// This method will panic if bitlists are not the same length.
-func (b *Bitlist64) Contains(c *Bitlist64) bool {
+// This method will return an error if bitlists are not the same length.
+func (b *Bitlist64) Contains(c *Bitlist64) (bool, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return false, ErrBitlistDifferentLength
 	}
 
 	// To ensure all of the bits in c are present in b, we iterate over every word, combine
@@ -185,23 +185,23 @@ func (b *Bitlist64) Contains(c *Bitlist64) bool {
 	// are assured that a word in c had bits not present in word in b.
 	for idx, word := range b.data {
 		if word^(word|c.data[idx]) != 0 {
-			return false
+			return false, nil
 		}
 	}
 
-	return true
+	return true, nil
 }
 
 // Overlaps returns true if the bitlist contains one of the bits from the provided argument
-// bitlist. This method will panic if bitlists are not the same length.
-func (b *Bitlist64) Overlaps(c *Bitlist64) bool {
+// bitlist. This method will return an error if bitlists are not the same length.
+func (b *Bitlist64) Overlaps(c *Bitlist64) (bool, error) {
 	lenB, lenC := b.Len(), c.Len()
 	if lenB != lenC {
-		panic("bitlists are different lengths")
+		return false, ErrBitlistDifferentLength
 	}
 
 	if lenB == 0 || lenC == 0 {
-		return false
+		return false, nil
 	}
 
 	// To ensure all of the bits in c are not overlapped in b, we iterate over every word, invert b
@@ -209,44 +209,45 @@ func (b *Bitlist64) Overlaps(c *Bitlist64) bool {
 	// we can be assured that word in c had bits not overlapped in b.
 	for idx, word := range b.data {
 		if (^word^c.data[idx])&c.data[idx]&allBitsSet != 0 {
-			return true
+			return true, nil
 		}
 	}
 
-	return false
+	return false, nil
 }
 
 // Or returns the OR result of the two bitfields (union).
-// This method will panic if the bitlists are not the same length.
-func (b *Bitlist64) Or(c *Bitlist64) *Bitlist64 {
+// This method will return an error if the bitlists are not the same length.
+func (b *Bitlist64) Or(c *Bitlist64) (*Bitlist64, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return nil, ErrBitlistDifferentLength
 	}
 
 	ret := b.Clone()
 	b.NoAllocOr(c, ret)
 
-	return ret
+	return ret, nil
 }
 
 // NoAllocOr computes the OR result of the two bitfields (union).
 // Result is written into provided variable, so no allocation takes place inside the function.
-// This method will panic if the bitlists are not the same length.
-func (b *Bitlist64) NoAllocOr(c, ret *Bitlist64) {
+// This method will return an error if the bitlists are not the same length.
+func (b *Bitlist64) NoAllocOr(c, ret *Bitlist64) error {
 	if b.Len() != c.Len() || b.Len() != ret.Len() {
-		panic("bitlists are different lengths")
+		return ErrBitlistDifferentLength
 	}
 
 	for idx, word := range b.data {
 		ret.data[idx] = word | c.data[idx]
 	}
+	return nil
 }
 
 // OrCount calculates number of bits set in a union of two bitfields.
-// This method will panic if the bitlists are not the same length.
-func (b *Bitlist64) OrCount(c *Bitlist64) uint64 {
+// This method will return an error if the bitlists are not the same length.
+func (b *Bitlist64) OrCount(c *Bitlist64) (uint64, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return 0, ErrBitlistDifferentLength
 	}
 
 	var cnt int
@@ -254,27 +255,27 @@ func (b *Bitlist64) OrCount(c *Bitlist64) uint64 {
 		cnt += bits.OnesCount64(b.data[idx] | c.data[idx])
 	}
 
-	return uint64(cnt)
+	return uint64(cnt), nil
 }
 
 // And returns the AND result of the two bitfields (intersection).
-// This method will panic if the bitlists are not the same length.
-func (b *Bitlist64) And(c *Bitlist64) *Bitlist64 {
+// This method will return an error if the bitlists are not the same length.
+func (b *Bitlist64) And(c *Bitlist64) (*Bitlist64, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return nil, ErrBitlistDifferentLength
 	}
 
 	ret := b.Clone()
 	b.NoAllocAnd(c, ret)
 
-	return ret
+	return ret, nil
 }
 
 // AndCount calculates number of bits set in an intersection of two bitfields.
-// This method will panic if the bitlists are not the same length.
-func (b *Bitlist64) AndCount(c *Bitlist64) uint64 {
+// This method will return an error if the bitlists are not the same length.
+func (b *Bitlist64) AndCount(c *Bitlist64) (uint64, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return 0, ErrBitlistDifferentLength
 	}
 
 	var cnt int
@@ -282,53 +283,55 @@ func (b *Bitlist64) AndCount(c *Bitlist64) uint64 {
 		cnt += bits.OnesCount64(b.data[idx] & c.data[idx])
 	}
 
-	return uint64(cnt)
+	return uint64(cnt), nil
 }
 
 // NoAllocAnd computes the AND result of the two bitfields (intersection).
 // Result is written into provided variable, so no allocation takes place inside the function.
-// This method will panic if the bitlists are not the same length.
-func (b *Bitlist64) NoAllocAnd(c, ret *Bitlist64) {
+// This method will return an error if the bitlists are not the same length.
+func (b *Bitlist64) NoAllocAnd(c, ret *Bitlist64) error {
 	if b.Len() != c.Len() || b.Len() != ret.Len() {
-		panic("bitlists are different lengths")
+		return ErrBitlistDifferentLength
 	}
 
 	for idx, word := range b.data {
 		ret.data[idx] = word & c.data[idx]
 	}
+	return nil
 }
 
 // Xor returns the XOR result of the two bitfields (symmetric difference).
-// This method will panic if the bitlists are not the same length.
-func (b *Bitlist64) Xor(c *Bitlist64) *Bitlist64 {
+// This method will return an error if the bitlists are not the same length.
+func (b *Bitlist64) Xor(c *Bitlist64) (*Bitlist64, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return nil, ErrBitlistDifferentLength
 	}
 
 	ret := b.Clone()
 	b.NoAllocXor(c, ret)
 
-	return ret
+	return ret, nil
 }
 
 // NoAllocXor returns the XOR result of the two bitfields (symmetric difference).
 // Result is written into provided variable, so no allocation takes place inside the function.
-// This method will panic if the bitlists are not the same length.
-func (b *Bitlist64) NoAllocXor(c, ret *Bitlist64) {
+// This method will return an error if the bitlists are not the same length.
+func (b *Bitlist64) NoAllocXor(c, ret *Bitlist64) error {
 	if b.Len() != c.Len() || b.Len() != ret.Len() {
-		panic("bitlists are different lengths")
+		return ErrBitlistDifferentLength
 	}
 
 	for idx, word := range b.data {
 		ret.data[idx] = word ^ c.data[idx]
 	}
+	return nil
 }
 
 // XorCount calculates number of bits set in a symmetric difference of two bitfields.
-// This method will panic if the bitlists are not the same length.
-func (b *Bitlist64) XorCount(c *Bitlist64) uint64 {
+// This method will return an error if the bitlists are not the same length.
+func (b *Bitlist64) XorCount(c *Bitlist64) (uint64, error) {
 	if b.Len() != c.Len() {
-		panic("bitlists are different lengths")
+		return 0, ErrBitlistDifferentLength
 	}
 
 	var cnt int
@@ -336,7 +339,7 @@ func (b *Bitlist64) XorCount(c *Bitlist64) uint64 {
 		cnt += bits.OnesCount64(b.data[idx] ^ c.data[idx])
 	}
 
-	return uint64(cnt)
+	return uint64(cnt), nil
 }
 
 // Not returns the NOT result of the bitfield (complement).
