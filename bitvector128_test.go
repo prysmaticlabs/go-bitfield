@@ -443,7 +443,7 @@ func TestBitvector128_Contains(t *testing.T) {
 				"(%x).Contains(%x) = %t, %v, wanted %t",
 				tt.a,
 				tt.b,
-				got, 
+				got,
 				err,
 				tt.want,
 			)

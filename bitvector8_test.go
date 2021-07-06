@@ -342,7 +342,7 @@ func TestBitvector8_Contains(t *testing.T) {
 				"(%x).Contains(%x) = %t, %v, wanted %t",
 				tt.a,
 				tt.b,
-				got, 
+				got,
 				err,
 				tt.want,
 			)
@@ -426,7 +426,7 @@ func TestBitVector8_Or(t *testing.T) {
 				"(%x).Or(%x) = %x, %v, wanted %x",
 				tt.a,
 				tt.b,
-				got, 
+				got,
 				err,
 				tt.want,
 			)

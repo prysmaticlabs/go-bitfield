@@ -699,7 +699,7 @@ func TestBitlist_Overlaps(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if result, err := tt.a.Overlaps(tt.b); result != tt.want || err != nil{
+		if result, err := tt.a.Overlaps(tt.b); result != tt.want || err != nil {
 			t.Errorf(
 				"(%x).Overlaps(%x) = %t, %v, wanted %t",
 				tt.a,
@@ -761,12 +761,12 @@ func TestBitlist_Or(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if got, err := tt.a.Or(tt.b); !bytes.Equal(got, tt.want)  || err != nil{
+		if got, err := tt.a.Or(tt.b); !bytes.Equal(got, tt.want) || err != nil {
 			t.Errorf(
 				"(%x).Or(%x) = %x, %v, wanted %x",
 				tt.a,
 				tt.b,
-				got, 
+				got,
 				err,
 				tt.want,
 			)
@@ -891,7 +891,7 @@ func TestBitlist_Xor(t *testing.T) {
 					"(%x).Xor(%x) = %x, %v, wanted %x",
 					tt.a,
 					tt.b,
-					got, 
+					got,
 					err,
 					tt.want,
 				)
