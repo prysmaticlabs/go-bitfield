@@ -337,8 +337,10 @@ func BenchmarkBitlist_OrCount(b *testing.B) {
 				}
 				b.StartTimer()
 				for i := 0; i < b.N; i++ {
-					s.Or(s1).Count()
-					s.Or(s2).Count()
+					a, _ := s.Or(s1)
+					a.Count()
+					b, _ := s.Or(s2)
+					b.Count()
 				}
 			})
 			b.Run("[]uint64", func(b *testing.B) {
@@ -353,8 +355,10 @@ func BenchmarkBitlist_OrCount(b *testing.B) {
 				}
 				b.StartTimer()
 				for i := 0; i < b.N; i++ {
-					s.Or(s1).Count()
-					s.Or(s2).Count()
+					a, _ := s.Or(s1)
+					a.Count()
+					b, _ := s.Or(s2)
+					b.Count()
 				}
 			})
 			b.Run("[]uint64 (noalloc)", func(b *testing.B) {
@@ -467,8 +471,10 @@ func BenchmarkBitlist_AndCount(b *testing.B) {
 				}
 				b.StartTimer()
 				for i := 0; i < b.N; i++ {
-					s.And(s1).Count()
-					s.And(s2).Count()
+					a, _ := s.And(s1)
+					a.Count()
+					b, _ := s.And(s2)
+					b.Count()
 				}
 			})
 			b.Run("[]uint64", func(b *testing.B) {
@@ -483,8 +489,10 @@ func BenchmarkBitlist_AndCount(b *testing.B) {
 				}
 				b.StartTimer()
 				for i := 0; i < b.N; i++ {
-					s.And(s1).Count()
-					s.And(s2).Count()
+					a, _ := s.And(s1)
+					a.Count()
+					b, _ := s.And(s2)
+					b.Count()
 				}
 			})
 			b.Run("[]uint64 (noalloc)", func(b *testing.B) {
@@ -597,8 +605,10 @@ func BenchmarkBitlist_XorCount(b *testing.B) {
 				}
 				b.StartTimer()
 				for i := 0; i < b.N; i++ {
-					s.Xor(s1).Count()
-					s.Xor(s2).Count()
+					a, _ := s.Xor(s1)
+					a.Count()
+					b, _ := s.Xor(s2)
+					b.Count()
 				}
 			})
 			b.Run("[]uint64", func(b *testing.B) {
@@ -613,8 +623,10 @@ func BenchmarkBitlist_XorCount(b *testing.B) {
 				}
 				b.StartTimer()
 				for i := 0; i < b.N; i++ {
-					s.Xor(s1).Count()
-					s.Xor(s2).Count()
+					a, _ := s.Xor(s1)
+					a.Count()
+					b, _ := s.Xor(s2)
+					b.Count()
 				}
 			})
 			b.Run("[]uint64 (noalloc)", func(b *testing.B) {
