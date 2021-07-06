@@ -337,12 +337,13 @@ func TestBitvector8_Contains(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if tt.a.Contains(tt.b) != tt.want {
+		if got, err := tt.a.Contains(tt.b); got != tt.want || err != nil {
 			t.Errorf(
-				"(%x).Contains(%x) = %t, wanted %t",
+				"(%x).Contains(%x) = %t, %v, wanted %t",
 				tt.a,
 				tt.b,
-				tt.a.Contains(tt.b),
+				got, 
+				err,
 				tt.want,
 			)
 		}
@@ -378,13 +379,13 @@ func TestBitvector8_Overlaps(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		result := tt.a.Overlaps(tt.b)
-		if result != tt.want {
+		if got, err := tt.a.Overlaps(tt.b); got != tt.want || err != nil {
 			t.Errorf(
-				"(%x).Overlaps(%x) = %t, wanted %t",
+				"(%x).Overlaps(%x) = %t, %v, wanted %t",
 				tt.a,
 				tt.b,
-				result,
+				got,
+				err,
 				tt.want,
 			)
 		}
@@ -420,12 +421,13 @@ func TestBitVector8_Or(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if !bytes.Equal(tt.a.Or(tt.b), tt.want) {
+		if got, err := tt.a.Or(tt.b); !bytes.Equal(got, tt.want) || err != nil {
 			t.Errorf(
-				"(%x).Or(%x) = %x, wanted %x",
+				"(%x).Or(%x) = %x, %v, wanted %x",
 				tt.a,
 				tt.b,
-				tt.a.Or(tt.b),
+				got, 
+				err,
 				tt.want,
 			)
 		}
