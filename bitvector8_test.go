@@ -42,6 +42,16 @@ func TestBitvector8_BitAt(t *testing.T) {
 			want:    true,
 		},
 		{
+			bitlist: Bitvector8{},
+			idx:     0,
+			want:    false,
+		},
+		{
+			bitlist: Bitvector8{0xFF, 0xFF},
+			idx:     0,
+			want:    false,
+		},
+		{
 			bitlist: Bitvector8{0x0E}, // 0b00001110
 			idx:     0,                //          ^
 			want:    false,
@@ -128,6 +138,12 @@ func TestBitvector8_SetBitAt(t *testing.T) {
 			idx:       5,                //     ^
 			val:       true,
 			want:      Bitvector8{0x20}, // 0b00100000
+		},
+		{
+			bitvector: Bitvector8{}, // 0b00000000
+			idx:       5,            //     ^
+			val:       true,
+			want:      Bitvector8{}, // 0b00000000
 		},
 		{
 			bitvector: Bitvector8{0x0F}, // 0b00001111

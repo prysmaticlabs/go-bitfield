@@ -23,7 +23,7 @@ func NewBitvector4() Bitvector4 {
 // exceeds the number of bits in the bitvector, then this method returns false.
 func (b Bitvector4) BitAt(idx uint64) bool {
 	// Out of bounds, must be false.
-	if idx >= b.Len() {
+	if idx >= b.Len() || len(b) != bitvector4ByteSize {
 		return false
 	}
 
@@ -37,7 +37,7 @@ func (b Bitvector4) BitAt(idx uint64) bool {
 // false.
 func (b Bitvector4) SetBitAt(idx uint64, val bool) {
 	// Out of bounds, do nothing.
-	if idx >= b.Len() {
+	if idx >= b.Len() || len(b) != bitvector4ByteSize {
 		return
 	}
 

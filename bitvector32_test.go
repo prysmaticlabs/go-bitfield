@@ -33,12 +33,12 @@ func TestBitvector32_BitAt(t *testing.T) {
 			want:    false,
 		},
 		{
-			bitlist: Bitvector32{0x01},
+			bitlist: Bitvector32{0x01, 0x00, 0x00, 0x00},
 			idx:     0,
 			want:    true,
 		},
 		{
-			bitlist: Bitvector32{0x0E, 0xAA, 0x2F},
+			bitlist: Bitvector32{0x0E, 0xAA, 0x2F, 0x00},
 			idx:     0,
 			want:    false,
 		},
@@ -53,14 +53,19 @@ func TestBitvector32_BitAt(t *testing.T) {
 			want:    false,
 		},
 		{
-			bitlist: Bitvector32{0x0E}, // 0b00001110
-			idx:     3,                 //       ^
+			bitlist: Bitvector32{0x0E, 0x00, 0x00, 0x00}, // 0b00001110
+			idx:     3,                                   //       ^
 			want:    true,
 		},
 		{
-			bitlist: Bitvector32{0x1E}, // 0b00011110
-			idx:     4,                 //      ^
+			bitlist: Bitvector32{0x1E, 0x00, 0x00, 0x00}, // 0b00011110
+			idx:     4,                                   //      ^
 			want:    true,
+		},
+		{ // 1 byte less
+			bitlist: Bitvector32{0x1E, 0x00, 0x00}, // 0b00011110
+			idx:     4,                             //      ^
+			want:    false,
 		},
 	}
 
@@ -125,6 +130,12 @@ func TestBitvector32_SetBitAt(t *testing.T) {
 			idx:       0,                                   //          ^
 			val:       true,
 			want:      Bitvector32{0x0F, 0x00, 0x00, 0x00}, // 0b00001111
+		},
+		{
+			bitvector: Bitvector32{0x00, 0x00, 0x00}, // 0b00000000
+			idx:       0,                             //          ^
+			val:       true,
+			want:      Bitvector32{0x00, 0x00, 0x00}, // 0b00000000
 		},
 		{
 			bitvector: Bitvector32{0x0F, 0x00, 0x00, 0x00}, // 0b00001111

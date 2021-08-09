@@ -38,34 +38,39 @@ func TestBitvector64_BitAt(t *testing.T) {
 			want:    false,
 		},
 		{
-			bitlist: Bitvector64{0x01},
+			bitlist: Bitvector64{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			idx:     0,
 			want:    true,
 		},
 		{
-			bitlist: Bitvector64{0x0E, 0xAA, 0x2F},
+			bitlist: Bitvector64{0x0E, 0xAA, 0x2F, 0x00, 0x00, 0x00, 0x00, 0x00},
 			idx:     0,
 			want:    false,
 		},
 		{
-			bitlist: Bitvector64{0x01, 0x23, 0xE2, 0xFE, 0xDD, 0xAC, 0xAD}, // 00000001 00100011 11100010 11111110 11011101 10101100 10101101 00000000
+			bitlist: Bitvector64{0x01, 0x23, 0xE2, 0xFE, 0xDD, 0xAC, 0xAD, 0x00}, // 00000001 00100011 11100010 11111110 11011101 10101100 10101101 00000000
 			idx:     55,
 			want:    true,
 		},
 		{
-			bitlist: Bitvector64{0x01, 0x23, 0xE2, 0xFE, 0xDD, 0xAC, 0xAD}, // 00000001 00100011 11100010 11111110 11011101 10101100 10101101 00000000
-			idx:     44,                                                    //        ^
+			bitlist: Bitvector64{0x01, 0x23, 0xE2, 0xFE, 0xDD, 0xAC, 0xAD, 0x00}, // 00000001 00100011 11100010 11111110 11011101 10101100 10101101 00000000
+			idx:     44,                                                          //        ^
 			want:    false,
 		},
 		{
-			bitlist: Bitvector64{0x0E}, // 0b00001110
-			idx:     3,                 //       ^
+			bitlist: Bitvector64{0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00001110
+			idx:     3,                                                           //       ^
 			want:    true,
 		},
 		{
-			bitlist: Bitvector64{0x1E}, // 0b00011110
-			idx:     4,                 //      ^
+			bitlist: Bitvector64{0x1E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00011110
+			idx:     4,                                                           //      ^
 			want:    true,
+		},
+		{ // 1 byte less
+			bitlist: Bitvector64{0x1E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00011110
+			idx:     4,                                                     //      ^
+			want:    false,
 		},
 	}
 
@@ -118,6 +123,12 @@ func TestBitvector64_SetBitAt(t *testing.T) {
 			idx:       30,                                                          //      ^
 			val:       true,
 			want:      Bitvector64{0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00}, // 0b00001000
+		},
+		{ // 1 byte less
+			bitvector: Bitvector64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00000000
+			idx:       30,                                                    //      ^
+			val:       true,
+			want:      Bitvector64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0b00000000
 		},
 		{
 			bitvector: Bitvector64{0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00}, // 0b00000000
