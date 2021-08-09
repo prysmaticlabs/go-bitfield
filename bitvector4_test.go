@@ -43,6 +43,16 @@ func TestBitvector4_BitAt(t *testing.T) {
 			want:    true,
 		},
 		{
+			bitlist: Bitvector4{},
+			idx:     0,
+			want:    false,
+		},
+		{
+			bitlist: Bitvector4{0xFF, 0xFF},
+			idx:     0,
+			want:    false,
+		},
+		{
 			bitlist: Bitvector4{0x0E}, // 0b00001110
 			idx:     0,                //          ^
 			want:    false,
@@ -112,6 +122,12 @@ func TestBitvector4_SetBitAt(t *testing.T) {
 			idx:       3,                //       ^
 			val:       true,
 			want:      Bitvector4{0x08}, // 0b00001000
+		},
+		{
+			bitvector: Bitvector4{}, // 0b00000000
+			idx:       3,            //     ^
+			val:       true,
+			want:      Bitvector4{}, // 0b00000000
 		},
 		{
 			bitvector: Bitvector4{0x00}, // 0b00000000

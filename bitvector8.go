@@ -22,8 +22,8 @@ func NewBitvector8() Bitvector8 {
 // BitAt returns the bit value at the given index. If the index requested
 // exceeds the number of bits in the bitvector, then this method returns false.
 func (b Bitvector8) BitAt(idx uint64) bool {
-	// Out of bounds, must be false.
-	if idx >= b.Len() {
+	// Out of bounds or incorrect bitvector byte size, must be false.
+	if idx >= b.Len() || len(b) != bitvector8ByteSize {
 		return false
 	}
 
@@ -36,7 +36,7 @@ func (b Bitvector8) BitAt(idx uint64) bool {
 // false.
 func (b Bitvector8) SetBitAt(idx uint64, val bool) {
 	// Out of bounds, do nothing.
-	if idx >= b.Len() {
+	if idx >= b.Len() || len(b) != bitvector8ByteSize {
 		return
 	}
 
