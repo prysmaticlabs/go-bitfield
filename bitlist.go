@@ -14,7 +14,7 @@ var _ = Bitfield(Bitlist{})
 //  byte{0b00001000} is a bitlist with 3 bits which are all zero. bits=[0,0,0]
 //  byte{0b00011111} is a bitlist with 4 bits which are all one.  bits=[1,1,1,1]
 //  byte{0b00011000, 0b00000001} is a bitlist with 8 bits.        bits=[0,0,0,1,1,0,0,0]
-//  byte{0b00011000, 0b00000010} is a bitlist with 9 bits.        bits=[0,0,0,0,1,1,0,0,0]
+//  byte{0b00011000, 0b00000010} is a bitlist with 9 bits.        bits=[0,0,0,1,1,0,0,0,0]
 type Bitlist []byte
 
 // NewBitlist creates a new bitlist of size N.
