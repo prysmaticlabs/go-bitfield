@@ -161,11 +161,8 @@ func (b Bitlist) Contains(c Bitlist) (bool, error) {
 		return false, ErrBitlistDifferentLength
 	}
 
-	// To ensure all of the bits in c are present in b, we iterate over every byte, combine
-	// the byte from b and c, then XOR them against b. If the result of this is non-zero, then we
-	// are assured that a byte in c had bits not present in b.
 	for i := 0; i < len(b); i++ {
-		if b[i]^(b[i]|c[i]) != 0 {
+		if b[i]&c[i] != c[i] {
 			return false, nil
 		}
 	}
