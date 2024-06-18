@@ -5,8 +5,8 @@
 // size after being constructed. These data types represent a list of bits whose
 // value is treated akin to a boolean. The bits are in little endian order.
 //
-// 	BitvectorN - A list of bits that is fixed in size.
-// 	Bitlist - A list of bits that is determined at runtime.
+//	BitvectorN - A list of bits that is fixed in size.
+//	Bitlist - A list of bits that is determined at runtime.
 //
 // The key difference between a bitvector and a bitlist is how they track the
 // number of bits in the array. A bitvectorN is known to have N bits at compile

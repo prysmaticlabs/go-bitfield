@@ -761,16 +761,33 @@ func TestBitlist_Or(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if got, err := tt.a.Or(tt.b); !bytes.Equal(got, tt.want) || err != nil {
-			t.Errorf(
-				"(%x).Or(%x) = %x, %v, wanted %x",
-				tt.a,
-				tt.b,
-				got,
-				err,
-				tt.want,
-			)
-		}
+		t.Run("Or()", func(t *testing.T) {
+			if got, err := tt.a.Or(tt.b); !bytes.Equal(got, tt.want) || err != nil {
+				t.Errorf(
+					"(%x).Or(%x) = %x, %v, wanted %x",
+					tt.a,
+					tt.b,
+					got,
+					err,
+					tt.want,
+				)
+			}
+		})
+
+		t.Run("NoAllocOr()", func(t *testing.T) {
+			for _, tt := range tests {
+				res := Bitlist(bytes.Clone(tt.a))
+				// Make sure that no existing bits set interfere with operation. This is done to simulate
+				// the case when res variable is already populated from the previous run.
+				for i := uint64(0); i < res.Len(); i += 10 {
+					res.SetBitAt(i, true)
+				}
+				tt.a.NoAllocOr(tt.b, res)
+				if !bytes.Equal(res, tt.want) {
+					t.Errorf("(%+v).NoAllocOr(%+v) = %+v, wanted %x", tt.a, tt.b, res, tt.want)
+				}
+			}
+		})
 	}
 }
 
