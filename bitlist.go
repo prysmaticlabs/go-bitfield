@@ -11,10 +11,11 @@ var _ = Bitfield(Bitlist{})
 // bitfield.
 //
 // Examples of the underlying byte array as bitlist:
-//  byte{0b00001000} is a bitlist with 3 bits which are all zero. bits=[0,0,0]
-//  byte{0b00011111} is a bitlist with 4 bits which are all one.  bits=[1,1,1,1]
-//  byte{0b00011000, 0b00000001} is a bitlist with 8 bits.        bits=[0,0,0,1,1,0,0,0]
-//  byte{0b00011000, 0b00000010} is a bitlist with 9 bits.        bits=[0,0,0,0,1,1,0,0,0]
+//
+//	byte{0b00001000} is a bitlist with 3 bits which are all zero. bits=[0,0,0]
+//	byte{0b00011111} is a bitlist with 4 bits which are all one.  bits=[1,1,1,1]
+//	byte{0b00011000, 0b00000001} is a bitlist with 8 bits.        bits=[0,0,0,1,1,0,0,0]
+//	byte{0b00011000, 0b00000010} is a bitlist with 9 bits.        bits=[0,0,0,0,1,1,0,0,0]
 type Bitlist []byte
 
 // NewBitlist creates a new bitlist of size N.
@@ -214,6 +215,20 @@ func (b Bitlist) Or(c Bitlist) (Bitlist, error) {
 	}
 
 	return ret, nil
+}
+
+// NoAllocOr computes the OR result of the two bitfields (union).
+// Result is written into provided variable, so no allocation takes place inside the function.
+// This method will return an error if the bitlists are not the same length.
+func (b Bitlist) NoAllocOr(c, ret Bitlist) error {
+	if b.Len() != c.Len() || b.Len() != ret.Len() {
+		return ErrBitlistDifferentLength
+	}
+
+	for idx, word := range b {
+		ret[idx] = word | c[idx]
+	}
+	return nil
 }
 
 // And returns the AND result of the two bitfields. This method will return an error if the bitlists are not the same length.
